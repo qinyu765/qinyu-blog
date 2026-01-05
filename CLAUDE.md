@@ -9,8 +9,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` - Build for production
 - `pnpm preview` - Preview production build locally
 
-Set `GEMINI_API_KEY` in `.env.local` before running the dev server (currently unused but configured in vite.config.ts).
-
 ## Architecture Overview
 
 This is a **Persona 3 Reload-inspired blog** built with React 19, Vite, and TypeScript. The design aesthetic heavily features:

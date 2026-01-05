@@ -153,7 +153,7 @@ export const downloadConfig = (): DownloadParams => {
     oneLinkUrl: 'https://m.malink.cn/s/jEf6Zf',
     openInstallAppKey: 'xamsmy',
     autoOpenAppStoreIfNotInWeChat: true,
-    weChatAppId: '1',
+    weChatAppId: '12',
     showDebugView,
     logger: container.logger(),
   };

@@ -1,5 +1,5 @@
-import React, { useState, useDeferredValue, useMemo } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useDeferredValue, useMemo, useEffect, useRef } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { BLOG_POSTS } from "../constants";
 import { Search, X } from "lucide-react";
 import Fuse from "fuse.js";
@@ -16,7 +16,34 @@ const fuse = new Fuse(BLOG_POSTS, {
 });
 
 export const BlogList: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const isSearchExpanded = searchParams.get("search") === "1";
+
+  useEffect(() => {
+    if (!isSearchExpanded) {
+      setQuery("");
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 170);
+    return () => window.clearTimeout(timer);
+  }, [isSearchExpanded]);
+
+  const handleSearchDismiss = () => {
+    if (query) {
+      setQuery("");
+      return;
+    }
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("search");
+      return next;
+    }, { replace: true });
+  };
+
   const deferredQuery = useDeferredValue(query.trim());
 
   const filteredPosts = useMemo(() => {
@@ -30,23 +57,34 @@ export const BlogList: React.FC = () => {
         ARCHIVE
       </h1>
 
-      {/* 搜索栏 */}
-      <div className="mb-10 max-w-lg">
-        <div className="relative transform -skew-x-12 border border-p3cyan/60 bg-black/50 hover:border-p3cyan transition-colors">
-          <div className="flex items-center px-5 py-3 skew-x-12">
-            <Search size={18} className="text-p3cyan shrink-0" />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="> SEARCH ARCHIVES..."
-              className="w-full bg-transparent border-none outline-none text-p3cyan font-mono placeholder-p3cyan/40 ml-3 text-sm"
-            />
-            {query && (
-              <button onClick={() => setQuery("")} aria-label="Clear search" className="text-white/40 hover:text-white transition-colors shrink-0">
-                <X size={18} />
-              </button>
-            )}
+      {/* 搜索栏：默认隐藏，?search=1 时展开 */}
+      <div
+        className={`overflow-hidden transition-all duration-300 ease-out ${
+          isSearchExpanded
+            ? "max-h-20 mb-10 opacity-100 translate-y-0"
+            : "max-h-0 mb-0 opacity-0 -translate-y-2 pointer-events-none"
+        }`}
+      >
+        <div className="max-w-lg ml-4">
+          <div className="relative transform -skew-x-12 border border-p3white bg-p3black hover:border-p3white transition-colors">
+            <div className="flex items-center px-5 py-3 skew-x-12">
+              <Search size={18} className="text-p3white shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                aria-label="Search blog posts"
+                tabIndex={isSearchExpanded ? 0 : -1}
+                placeholder="> SEARCH ARCHIVES..."
+                className="w-full bg-transparent border-none outline-none text-p3cyan font-mono placeholder-p3cyan/40 ml-3 text-sm caret-p3red"
+              />
+              {isSearchExpanded && (
+                <button type="button" onClick={handleSearchDismiss} aria-label={query ? "Clear search" : "Close search"} className="text-white hover:text-p3red transition-colors shrink-0">
+                  <X size={18} />
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -82,7 +120,7 @@ export const BlogList: React.FC = () => {
         ) : (
           <div className="text-center py-20">
             <div className="text-3xl font-display italic text-white/20 mb-4">NO RECORDS FOUND</div>
-            <div className="w-3 h-3 bg-p3cyan mx-auto animate-spin rotate-45" />
+            <div className="w-3 h-3 bg-p3red shadow-[0_0_12px_rgba(244,2,32,0.8)] mx-auto animate-spin rotate-45" />
           </div>
         )}
       </div>

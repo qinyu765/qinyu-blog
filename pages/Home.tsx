@@ -26,13 +26,16 @@ export const Home: React.FC = () => {
     <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
       {/* Hero Section */}
       <section className="relative w-full min-h-[50vh] flex items-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-8 items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-8 items-center">
           {/* Typography Graphic */}
           <div className="space-y-6 z-10">
             <div className="flex justify-center max-w-md">
-              <img src="/logo.svg" alt="Logo" className="w-48 sm:w-64 md:w-80 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]" />
+              <div className="relative">
+                <div className="absolute -inset-4 bg-p3cyan/10 blur-3xl rounded-full animate-pulse" />
+                <img src="/logo.svg" alt="Logo" className="relative w-48 sm:w-64 md:w-80 drop-shadow-[0_5px_5px_rgba(0,0,0,0.8)]" />
+              </div>
             </div>
-            <p className="text-base md:text-lg font-light tracking-wider border-l-4 border-p3blue pl-4 bg-black/40 py-3 backdrop-blur-sm max-w-md text-p3white/80 leading-relaxed">
+            <p className="text-base md:text-lg font-light border-l-4 border-p3blue pl-4 bg-black/40 py-3 backdrop-blur-sm max-w-md text-p3white/80 leading-relaxed">
               简单写写博客，记录一些想法和经历。偶尔也会分享一些有趣的资源和工具。欢迎来到我的个人博客！希望你能在这里找到一些有价值的内容。
             </p>
           </div>
@@ -45,7 +48,7 @@ export const Home: React.FC = () => {
               className="block relative transform transition-transform duration-300"
             >
               {/* Header Label */}
-              <div className="absolute -top-4 -left-4 z-20 bg-p3blue text-white px-4 py-1 transform -skew-x-12 font-bold shadow-lg">
+              <div className="absolute -top-4 -left-4 z-20 bg-p3red text-p3black px-4 py-1 transform -skew-x-12 font-bold shadow-lg">
                 FEATURED ENTRY
               </div>
 
@@ -98,7 +101,7 @@ export const Home: React.FC = () => {
               <div className="p-6 relative z-10 flex flex-col h-full justify-between">
                 <div>
                   <div className="flex items-center space-x-2 mb-2">
-                    <Star size={12} className="text-p3cyan" />
+                    <Star size={12} className="text-p3red" />
                     <span className="text-xs font-mono text-p3cyan">
                       {post.date}
                     </span>

@@ -5,41 +5,46 @@ interface SkewButtonProps {
   to: string;
   children: React.ReactNode;
   isActive?: boolean;
+  hoverActive?: boolean;
 }
 
-/** P3R 标志性斜切按钮：容器 -skew-x-12，内部文字 skew-x-12 反向抵消 */
-export const SkewButton: React.FC<SkewButtonProps> = ({ to, children, isActive }) => {
+export const SkewButton: React.FC<SkewButtonProps> = ({ to, children, isActive, hoverActive = false }) => {
   const location = useLocation();
-  const active = isActive !== undefined ? isActive : location.pathname === to;
+  const [targetPath] = to.split('?');
+  const active = isActive !== undefined ? isActive : location.pathname === targetPath;
+
+  const bgClass = active
+    ? 'bg-white border-p3blue'
+    : hoverActive
+      ? 'bg-transparent border-p3blue group-hover:bg-white group-hover:border-p3blue'
+      : 'bg-transparent border-p3blue group-hover:bg-p3blue/20';
+
+  const textClass = active
+    ? 'text-p3dark font-bold'
+    : hoverActive
+      ? 'text-white group-hover:text-p3dark group-hover:font-bold'
+      : 'text-white group-hover:text-p3cyan';
 
   return (
-    <Link to={to} className="relative group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark">
-      {/* 斜切背景层 */}
+    <Link to={to} aria-current={active ? "page" : undefined} className="relative group block transition-transform duration-200 ease-out hover:-translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark">
       <div
         className={`
-          absolute inset-0 transform -skew-x-12 transition-all duration-300
-          border
-          ${active ? 'bg-white border-white' : 'bg-transparent border-white/40 hover:bg-p3blue/50'}
+          absolute inset-0 transform -skew-x-12 transition-all duration-200 ease-out
+          border-[3px] group-hover:shadow-[3px_3px_0_0_rgba(18,105,204,0.5)]
+          ${bgClass}
         `}
       />
-
-      {/* 文字层（反向斜切保持水平） */}
-      <div className="relative px-5 py-1.5">
+      <div className="relative px-6 py-2">
         <span
           className={`
             font-display text-base tracking-wider transform skew-x-12 block
             transition-colors duration-300
-            ${active ? 'text-p3dark font-bold' : 'text-white group-hover:text-p3cyan'}
+            ${textClass}
           `}
         >
           {children}
         </span>
       </div>
-
-      {/* 激活态装饰菱形点 */}
-      {active && (
-        <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-p3cyan rotate-45 animate-pulse" />
-      )}
     </Link>
   );
 };

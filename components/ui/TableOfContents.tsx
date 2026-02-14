@@ -18,12 +18,12 @@ const TocList: React.FC<Omit<TableOfContentsProps, 'collapsible'>> = ({ headings
           className={`text-left w-full transition-all duration-200 group ${item.level > 2 ? 'pl-5' : ''}`}
         >
           <div className={`
-            relative py-1.5 px-3 border-l-2 transition-all duration-200
+            relative py-2 px-3 border-l-2 transition-all duration-200 flex items-center
             ${activeId === item.id
               ? 'border-p3cyan text-white font-bold bg-p3cyan/5'
               : 'border-transparent text-white/60 hover:text-white/90 hover:border-white/20'}
           `}>
-            <span className={`block truncate ${item.level > 2 ? 'text-xs' : 'text-sm'}`}>
+            <span className={`block ${item.level > 2 ? 'text-xs' : 'text-sm'} leading-snug`}>
               {item.text}
             </span>
           </div>
@@ -68,7 +68,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({ headings, acti
   }
 
   return (
-    <nav className="bg-black/40 backdrop-blur-md border border-white/10 rounded-sm p-5">
+    <nav className="backdrop-blur-md p-5">
       <p className="text-[10px] uppercase tracking-[0.25em] text-white/30 mb-4">Contents</p>
       <TocList headings={headings} activeId={activeId} onItemClick={onItemClick} />
     </nav>

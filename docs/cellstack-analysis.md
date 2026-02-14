@@ -6,16 +6,16 @@
 
 ## 一、CellStack 技术栈概览
 
-| 维度 | CellStack | P3R Blog（当前） |
-|------|-----------|-----------------|
-| 框架 | Next.js (App Router, `output: "export"` SSG) | React 19 + Vite SPA |
-| 路由 | 文件系统路由 | HashRouter |
-| 样式 | Tailwind + CSS Variables（像素风） | Tailwind CDN + 内联配置（P3R 风） |
-| 内容解析 | `gray-matter` (完整 YAML) | 自写正则解析器（仅单层 kv） |
-| 部署 | GitHub Pages + GitHub Actions | 同 |
-| 评论 | Giscus (GitHub Discussions) | 无 |
-| 搜索 | Pagefind (构建时索引) | 无 |
-| 代码高亮 | CodeBlock 组件 | 无（纯 `<pre>` 标签） |
+| 维度     | CellStack                                    | P3R Blog（当前）                  |
+| -------- | -------------------------------------------- | --------------------------------- |
+| 框架     | Next.js (App Router, `output: "export"` SSG) | React 19 + Vite SPA               |
+| 路由     | 文件系统路由                                 | HashRouter                        |
+| 样式     | Tailwind + CSS Variables（像素风）           | Tailwind CDN + 内联配置（P3R 风） |
+| 内容解析 | `gray-matter` (完整 YAML)                    | 自写正则解析器（仅单层 kv）       |
+| 部署     | GitHub Pages + GitHub Actions                | 同                                |
+| 评论     | Giscus (GitHub Discussions)                  | 无                                |
+| 搜索     | Pagefind (构建时索引)                        | 无                                |
+| 代码高亮 | CodeBlock 组件                               | 无（纯 `<pre>` 标签）             |
 
 ---
 
@@ -77,16 +77,16 @@ content/
 
 **Frontmatter 对比：**
 
-| 字段 | CellStack | P3R Blog |
-|------|-----------|----------|
-| `title` | 有 | 有 |
-| `date` | `2026-02-13`（ISO 格式） | `"2024.04.22"`（自定义格式） |
-| `description` | 有（长摘要） | `excerpt`（短摘要） |
-| `category` | 无（通过目录位置隐式分类） | 有（`TECH \| LIFE \| MEMO`） |
-| `tags` | 有（仅在 Topics index.md 中） | 无 |
-| `order` | 有（数字，用于排序） | 无（按日期排序） |
-| `coverImage` | 无（自动提取正文首图） | 有（可选） |
-| `author` | 有（仅在 Topics index.md 中） | 无 |
+| 字段          | CellStack                     | P3R Blog                     |
+| ------------- | ----------------------------- | ---------------------------- |
+| `title`       | 有                            | 有                           |
+| `date`        | `2026-02-13`（ISO 格式）      | `"2024.04.22"`（自定义格式） |
+| `description` | 有（长摘要）                  | `excerpt`（短摘要）          |
+| `category`    | 无（通过目录位置隐式分类）    | 有（`TECH \| LIFE \| MEMO`） |
+| `tags`        | 有（仅在 Topics index.md 中） | 无                           |
+| `order`       | 有（数字，用于排序）          | 无（按日期排序）             |
+| `coverImage`  | 无（自动提取正文首图）        | 有（可选）                   |
+| `author`      | 有（仅在 Topics index.md 中） | 无                           |
 
 ---
 
@@ -102,11 +102,13 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 - 封面图逻辑：若 frontmatter 未指定 `image`，`getPostBySlug()` 自动从正文提取首个 `![...](url)` 的 URL
 
 **优点：**
+
 - 仓库体积极小，clone/build 速度快
 - CDN 自带全球加速和缓存
 - 图片独立于代码版本管理
 
 **缺点：**
+
 - 依赖第三方服务（TOS 停服则图片全部失效）
 - 图片与文章的关联关系松散
 - 无法通过 Git 追踪图片变更历史
@@ -119,11 +121,11 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 
 ### 3.3 可选的改进方向
 
-| 方案 | 描述 | 适用场景 |
-|------|------|----------|
-| **维持外部 CDN** | 使用免费图床（如 GitHub Release、Cloudflare R2 免费额度） | 图片数量多、追求极致构建速度 |
+| 方案                        | 描述                                                           | 适用场景                              |
+| --------------------------- | -------------------------------------------------------------- | ------------------------------------- |
+| **维持外部 CDN**            | 使用免费图床（如 GitHub Release、Cloudflare R2 免费额度）      | 图片数量多、追求极致构建速度          |
 | **仓库内 `public/images/`** | 按文章 slug 建子目录：`public/images/persona-ui-design/01.png` | 图片数量少（< 50 张）、追求版本可追溯 |
-| **Markdown 相对路径** | 图片与 `.md` 同目录，需配置 Vite 处理 | 内容与图片强关联场景 |
+| **Markdown 相对路径**       | 图片与 `.md` 同目录，需配置 Vite 处理                          | 内容与图片强关联场景                  |
 
 ---
 
@@ -134,12 +136,14 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 **原理：** 将 GitHub Discussions 映射为博客评论区，每篇文章对应一个 Discussion 话题。
 
 **CellStack 实现要点：**
+
 - 使用 `@giscus/react` 包
 - `mapping="specific"` + `term={slug}` — 按文章 slug 精准匹配 Discussion
 - `key={term}` 强制组件重挂载，切换文章时刷新评论
 - `lang="zh-CN"` 中文界面
 
 **适配 P3R Blog 的工作量：**
+
 1. 在 GitHub 仓库开启 Discussions
 2. 安装 [Giscus App](https://github.com/apps/giscus)
 3. 在 `BlogPost.tsx` 底部添加 `<Giscus>` 组件
@@ -150,6 +154,7 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 **当前问题：** [MarkdownRenderer.tsx](../components/MarkdownRenderer.tsx) 的 `code` / `pre` 渲染仅有背景色和边框，无语法着色。
 
 **方案选择：**
+
 - `react-syntax-highlighter` — 开箱即用，主题丰富（推荐 `vscDarkPlus` 或自定义 P3R 主题）
 - `shiki` — 更精准的 VS Code 级高亮，但体积较大
 
@@ -158,6 +163,7 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 **原理：** 构建后对 `dist/` 中的 HTML 建立倒排索引，运行时纯前端查询，无后端。
 
 **适配难点：**
+
 - Pagefind 需要 HTML 文件作为输入，而 SPA 只有一个 `index.html`
 - 需要 `vite-plugin-pagefind` 或构建后脚本生成静态 HTML
 - **替代方案**：用 `fuse.js` 对文章标题 + 摘要做前端模糊搜索，实现更简单
@@ -165,6 +171,7 @@ CellStack 采用**外部 CDN 托管**，图片不存储在仓库中：
 ### 4.4 文章目录 TOC（推荐优先级：中）
 
 **实现思路：**
+
 - 解析 markdown 内容中的 `##` / `###` 标题
 - 生成锚点导航列表
 - 监听滚动事件高亮当前章节
@@ -204,14 +211,15 @@ content/
 ```
 
 **Frontmatter 扩展建议：**
+
 ```yaml
 ---
 title: "文章标题"
 date: "2024.04.22"
 category: "TECH"
 excerpt: "摘要"
-coverImage: "https://..."     # 可选
-tags: ["React", "UI"]         # 新增：需升级解析器支持数组
+coverImage: "https://..." # 可选
+tags: ["React", "UI"] # 新增：需升级解析器支持数组
 ---
 ```
 
@@ -221,16 +229,16 @@ tags: ["React", "UI"]         # 新增：需升级解析器支持数组
 
 ## 六、总结：优先级路线图
 
-| 阶段 | 功能 | 工作量 | 价值 | 状态 |
-|------|------|--------|------|------|
-| **第一阶段** | 代码语法高亮 | 小 | 高（技术博客刚需） | ✅ 已完成 |
-| **第一阶段** | Giscus 评论 | 小 | 高（读者互动） | ✅ 已完成 |
-| **第一阶段** | 阅读时间估算 | 极小 | 中 | ✅ 已完成 |
-| **第二阶段** | 文章目录 TOC | 中 | 高（长文体验） | |
-| **第二阶段** | 前端搜索 (fuse.js) | 中 | 中 | |
-| **第三阶段** | Frontmatter 升级 (tags + gray-matter) | 中 | 中（为后续功能铺路） | |
-| **第三阶段** | Topics 系列专题 | 大 | 高（内容沉淀后价值凸显） | |
-| **远期** | Pagefind / SSG 迁移 | 大 | 高（SEO + 搜索） | |
+| 阶段         | 功能                                  | 工作量 | 价值                     | 状态      |
+| ------------ | ------------------------------------- | ------ | ------------------------ | --------- |
+| **第一阶段** | 代码语法高亮                          | 小     | 高（技术博客刚需）       | ✅ 已完成 |
+| **第一阶段** | Giscus 评论                           | 小     | 高（读者互动）           | ✅ 已完成 |
+| **第一阶段** | 阅读时间估算                          | 极小   | 中                       | ✅ 已完成 |
+| **第二阶段** | 文章目录 TOC                          | 中     | 高（长文体验）           | ✅ 已完成 |
+| **第二阶段** | 前端搜索 (fuse.js)                    | 中     | 中                       | ✅ 已完成 |
+| **第三阶段** | Frontmatter 升级 (tags + gray-matter) | 中     | 中（为后续功能铺路）     |           |
+| **第三阶段** | Topics 系列专题                       | 大     | 高（内容沉淀后价值凸显） |           |
+| **远期**     | Pagefind / SSG 迁移                   | 大     | 高（SEO + 搜索）         |           |
 
 ---
 

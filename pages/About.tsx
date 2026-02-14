@@ -38,7 +38,7 @@ export const About: React.FC = () => {
               <div key={skill} className="bg-p3dark/50 p-3 border border-white/10 flex items-center justify-between group hover:bg-p3blue/20 transition-colors cursor-default">
                 <span>{skill}</span>
                 <div className="w-12 h-1 bg-p3blue/30 overflow-hidden">
-                  <div className="h-full bg-p3cyan" style={{ width }} />
+                  <div className="h-full bg-gradient-to-r from-p3red to-p3cyan" style={{ width }} />
                 </div>
               </div>
             ))}

@@ -5,8 +5,6 @@ category: "TECH"
 excerpt: "Deep dive into React.memo, useMemo, and useCallback to prevent unnecessary re-renders in complex dashboards."
 ---
 
-# Optimizing Rendering Cycles
-
 Performance is feature. When building complex dashboards with high-frequency updates, React's render cycle can become a bottleneck.
 
 ## The Big Three

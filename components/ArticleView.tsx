@@ -25,12 +25,14 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
 
   const [shareMsg, setShareMsg] = useState('');
   const [activeId, setActiveId] = useState('');
+  const isScrollingLocked = React.useRef(false);
 
   useEffect(() => { setActiveId(''); }, [post.id]);
 
   useEffect(() => {
     if (!headings.length) { setActiveId(''); return; }
     const handleScroll = () => {
+      if (isScrollingLocked.current) return;
       let current = '';
       for (const h of headings) {
         const el = document.getElementById(h.id);
@@ -46,8 +48,15 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   const scrollToHeading = useCallback((headingId: string) => {
     const el = document.getElementById(headingId);
     if (!el) return;
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    isScrollingLocked.current = true;
     setActiveId(headingId);
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // 平滑滚动通常需要一定时间，在此期间锁定自动计算。800ms大约能覆盖常见的滚动动画周期。
+    setTimeout(() => {
+      isScrollingLocked.current = false;
+    }, 800);
   }, []);
 
   const handleShare = useCallback(async () => {

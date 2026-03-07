@@ -66,7 +66,7 @@ const styles = `
 
   @keyframes p3r-moon-drift {
     0%   { transform: translate3d(0,0,0); }
-    50%  { transform: translate3d(-10px,12px,0); }
+    50%  { transform: translate3d(-20px,24px,0); }
     100% { transform: translate3d(0,0,0); }
   }
 

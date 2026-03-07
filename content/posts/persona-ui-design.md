@@ -5,8 +5,6 @@ category: "TECH"
 excerpt: "Exploring the diegetic UI design patterns found in modern RPGs and how to implement them in React."
 ---
 
-# The Aesthetics of Interface
-
 UI design in games like Persona 3 Reload isn't just about utility; it's about **style** and **immersion**. The menu isn't a separate layer; it feels like part of the character's cognition.
 
 ## Skewed Layouts

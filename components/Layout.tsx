@@ -60,8 +60,11 @@ export const Layout: React.FC = () => {
           headerVisible ? "translate-y-0" : "-translate-y-full"
         }`}
       >
-        {/* 左侧状态指示器 */}
+        {/* 左侧 Logo + 状态指示器 */}
         <div className="hidden md:flex flex-1 min-w-0 items-center space-x-2 text-sm font-mono text-p3cyan tracking-wider">
+          <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <img src="/logo.svg" alt="Logo" className="h-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" />
+          </Link>
           <span className="text-p3blue"> ❯❯  </span>
           <Link to="/" className="hover:text-white transition-colors">
             SYSTEM
@@ -90,24 +93,22 @@ export const Layout: React.FC = () => {
           )}
         </div>
 
-        {/* 桌面端居中导航 */}
+        {/* 桌面端右侧导航 */}
         <nav
           aria-label="Primary"
-          className="hidden md:flex items-center justify-center space-x-4 flex-[2]"
+          className="hidden md:flex items-center justify-end gap-2"
         >
           {NAV_ITEMS.map((item) => (
             <SkewButton key={item.path} to={item.path}>
               {item.label}
             </SkewButton>
           ))}
+          <div className="ml-10">
+            <SkewButton to="/blog?search=1" hoverActive isActive={isSearchActive}>
+              <span className="flex items-center gap-1.5"><Search size={14} />SEARCH</span>
+            </SkewButton>
+          </div>
         </nav>
-
-        {/* 桌面端右侧搜索按钮 */}
-        <div className="hidden md:flex flex-1 min-w-0 justify-end">
-          <SkewButton to="/blog?search=1" hoverActive isActive={isSearchActive}>
-            <span className="flex items-center gap-1.5"><Search size={14} />SEARCH</span>
-          </SkewButton>
-        </div>
 
         {/* 移动端汉堡按钮 */}
         <div className="md:hidden absolute right-6">
@@ -129,7 +130,6 @@ export const Layout: React.FC = () => {
         <Outlet />
       </main>
 
-      <div className="fixed bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-p3red via-p3blue to-p3cyan z-40" />
     </div>
   );
 };

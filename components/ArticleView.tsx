@@ -79,26 +79,27 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           </div>
         </div>
 
-        <header className="mb-8 relative">
-          <div className="absolute -left-4 md:-left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-p3cyan via-p3blue to-transparent" />
-          <div className="flex flex-wrap gap-4 text-xs font-mono text-p3cyan mb-4">
-            <span className="border border-p3cyan px-2 py-1">{post.date}</span>
-            <span className="bg-p3red text-white px-2 py-1">{post.category}</span>
-            <span className="border border-white/20 text-p3mid px-2 py-1">{estimateReadingTime(post.content)} MIN READ</span>
+        <header className="mb-12 relative p-8 md:p-12 border-2 border-white/10 bg-p3dark/50 overflow-hidden">
+          {/* 背景大字与斜纹 */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')] opacity-10 pointer-events-none" />
+          <div className="absolute -right-8 -top-8 text-[8rem] md:text-[12rem] font-display font-black text-white/5 transform -skew-x-12 select-none leading-none pointer-events-none overflow-hidden">
+            {post.category || 'ARTICLE'}
           </div>
-          <h1 className="text-4xl md:text-6xl font-display font-black uppercase italic leading-tight mb-8">
-            {post.title}
-          </h1>
-          {post.coverImage && (
-            <div className="relative w-full aspect-[21/9] overflow-hidden border-2 border-white/20">
-              <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" loading="lazy" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0D1B2A] to-transparent opacity-80" />
+          
+          <div className="relative z-10">
+            <div className="flex flex-wrap gap-4 text-xs font-mono text-p3cyan mb-6">
+              <span className="border border-p3cyan bg-p3cyan/10 px-3 py-1.5">{post.date}</span>
+              <span className="bg-p3red text-white px-3 py-1.5 transform -skew-x-12"><span className="inline-block skew-x-12">{post.category}</span></span>
+              <span className="border border-white/20 text-p3mid px-3 py-1.5">{estimateReadingTime(post.content)} MIN READ</span>
             </div>
-          )}
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-black uppercase italic leading-tight text-white drop-shadow-lg">
+              {post.title}
+            </h1>
+          </div>
         </header>
 
         {headings.length > 0 && (
-          <div className="xl:hidden">
+          <div className="2xl:hidden">
             <TableOfContents headings={headings} activeId={activeId} onItemClick={scrollToHeading} collapsible />
           </div>
         )}
@@ -109,9 +110,8 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         </div>
 
         {import.meta.env.VITE_GISCUS_REPO_ID && import.meta.env.VITE_GISCUS_REPO_ID !== 'your-repo-id' && (
-          <div className="mt-12 border border-white/10 p-6">
+          <div className="mt-12 border border-white/10 p-6" key={post.id}>
             <Giscus
-              key={post.id}
               repo={import.meta.env.VITE_GISCUS_REPO as `${string}/${string}`}
               repoId={import.meta.env.VITE_GISCUS_REPO_ID}
               category={import.meta.env.VITE_GISCUS_CATEGORY}
@@ -156,7 +156,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
       </article>
 
       {headings.length > 0 && (
-        <aside className="hidden xl:block fixed top-24 left-8 w-64">
+        <aside className="hidden 2xl:block fixed top-24 left-8 w-64">
           <TableOfContents headings={headings} activeId={activeId} onItemClick={scrollToHeading} />
         </aside>
       )}

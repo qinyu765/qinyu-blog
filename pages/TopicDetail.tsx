@@ -22,31 +22,32 @@ export const TopicDetail: React.FC = () => {
         <span>All Topics</span>
       </Link>
 
-      {/* 专题头部 */}
-      <header className="mb-10 relative">
-        <div className="absolute -left-4 md:-left-12 top-0 bottom-0 w-1 bg-gradient-to-b from-p3cyan via-p3blue to-transparent" />
+      {/* 专题海报风格头部 */}
+      <header className="mb-12 relative p-8 md:p-12 border-2 border-white/10 bg-p3dark/50 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==')] opacity-10 pointer-events-none" />
+        <div className="absolute -right-8 -top-8 text-[6rem] md:text-[10rem] font-display font-black text-white/5 transform -skew-x-12 select-none leading-none pointer-events-none whitespace-nowrap">
+          SERIES
+        </div>
+        <div className="absolute left-0 top-0 bottom-0 w-2 bg-gradient-to-b from-p3cyan via-p3blue to-transparent" />
 
-        {meta.tags && meta.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {meta.tags.map((tag) => (
-              <span key={tag} className="inline-block -skew-x-12 border border-p3mid/30 px-2 py-0.5">
-                <span className="inline-block skew-x-12 text-p3mid text-xs font-mono">{tag}</span>
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="relative z-10">
+          {meta.tags && meta.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-6">
+              {meta.tags.map((tag) => (
+                <span key={tag} className="inline-block -skew-x-12 border border-p3cyan/50 bg-p3cyan/10 px-3 py-1">
+                  <span className="inline-block skew-x-12 text-p3cyan text-xs font-mono font-bold uppercase">{tag}</span>
+                </span>
+              ))}
+            </div>
+          )}
 
-        <h1 className="text-4xl md:text-6xl font-display font-black uppercase italic leading-tight mb-4">
-          {meta.title}
-        </h1>
-        <p className="text-p3mid text-base leading-relaxed">{meta.description}</p>
-
-        {meta.coverImage && (
-          <div className="relative w-full aspect-[21/9] overflow-hidden border-2 border-white/20 mt-6">
-            <img src={meta.coverImage} alt={meta.title} className="w-full h-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0D1B2A] to-transparent opacity-80" />
-          </div>
-        )}
+          <h1 className="text-4xl md:text-6xl font-display font-black uppercase italic leading-tight mb-6 text-white drop-shadow-lg">
+            {meta.title}
+          </h1>
+          <p className="text-p3mid text-lg leading-relaxed max-w-2xl border-l-4 border-p3red pl-4 bg-black/20 py-2 pr-4">
+            {meta.description}
+          </p>
+        </div>
       </header>
 
       {/* 系列介绍 */}

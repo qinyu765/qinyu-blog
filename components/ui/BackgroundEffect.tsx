@@ -122,7 +122,6 @@ export const BackgroundEffect: React.FC = () => {
       <style>{styles}</style>
 
       <div className="absolute inset-0 p3r-bg-base" />
-      <div className="absolute inset-0 p3r-caustics" />
       <div className="absolute inset-0 p3r-noise" />
 
       {/* 残月：bloom 外晕 → light 月面 → mask 遮罩（translateX 偏移形成月牙） */}

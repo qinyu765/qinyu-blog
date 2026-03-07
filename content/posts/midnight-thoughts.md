@@ -2,7 +2,6 @@
 title: "WANDERING THE DARK HOUR"
 date: "2024.06.15"
 category: "LIFE"
-coverImage: "https://picsum.photos/800/402"
 excerpt: "Personal reflections on productivity, burnout, and finding balance in the digital age."
 ---
 

@@ -53,10 +53,6 @@ export const BlogList: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-right-8 duration-500">
-      <h1 className="text-6xl font-display font-black italic mb-12 text-white/20">
-        ARCHIVE
-      </h1>
-
       {/* 搜索栏：默认隐藏，?search=1 时展开 */}
       <div
         className={`overflow-hidden transition-all duration-300 ease-out ${
@@ -91,32 +87,50 @@ export const BlogList: React.FC = () => {
 
       <div className="space-y-4">
         {filteredPosts.length > 0 ? (
-          filteredPosts.map((post, index) => (
-            <Link
-              key={post.id}
-              to={`/blog/${post.id}`}
-              className="group block relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
-            >
-              <div className="absolute inset-0 bg-p3blue transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out z-0" />
+          filteredPosts.map((post, index) => {
+            const yearStr = post.date.substring(0, 4);
+            const prevPost = index > 0 ? filteredPosts[index - 1] : null;
+            const prevYearStr = prevPost ? prevPost.date.substring(0, 4) : null;
+            const showYear = yearStr !== prevYearStr;
 
-              <div className="relative z-10 flex items-center p-6 border-b border-white/20 group-hover:border-transparent transition-colors">
-                <div className="font-mono text-p3cyan text-lg w-32 shrink-0">
-                  {post.date}
-                </div>
-                <div className="flex-grow">
-                  <h2 className="text-2xl font-bold uppercase group-hover:text-white transition-colors">
-                    {post.title}
-                  </h2>
-                  <p className="text-sm text-p3mid/70 group-hover:text-white/80 line-clamp-1">
-                    {post.excerpt}
-                  </p>
-                </div>
-                <div className="text-4xl font-display italic text-white/10 group-hover:text-white/30 transition-colors">
-                  {(index + 1).toString().padStart(2, "0")}
-                </div>
-              </div>
-            </Link>
-          ))
+            return (
+              <React.Fragment key={post.id}>
+                {showYear && (
+                  <div className="relative mt-12 mb-8 group">
+                    <div className="text-5xl md:text-7xl font-display font-black italic text-p3white tracking-tighter mix-blend-screen opacity-80">
+                      {yearStr}
+                    </div>
+                    {/* 装饰线条 */}
+                    <div className="absolute left-0 bottom-2 w-full h-[2px] bg-gradient-to-r from-p3cyan via-p3cyan/20 to-transparent transform -skew-x-12" />
+                    <div className="absolute left-0 -bottom-1 w-1/3 h-[4px] bg-p3cyan transform -skew-x-12" />
+                  </div>
+                )}
+                <Link
+                  to={`/blog/${post.id}`}
+                  className="group block relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+                >
+                  <div className="absolute inset-0 bg-p3blue transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out z-0" />
+
+                  <div className="relative z-10 flex items-center p-6 border-b border-white/20 group-hover:border-transparent transition-colors">
+                    <div className="font-mono text-p3cyan text-lg w-32 shrink-0">
+                      {post.date}
+                    </div>
+                    <div className="flex-grow">
+                      <h2 className="text-2xl font-bold uppercase group-hover:text-white transition-colors">
+                        {post.title}
+                      </h2>
+                      <p className="text-sm text-p3mid/70 group-hover:text-white/80 line-clamp-1">
+                        {post.excerpt}
+                      </p>
+                    </div>
+                    <div className="text-4xl font-display italic text-white/10 group-hover:text-white/30 transition-colors">
+                      {(index + 1).toString().padStart(2, "0")}
+                    </div>
+                  </div>
+                </Link>
+              </React.Fragment>
+            );
+          })
         ) : (
           <div className="text-center py-20">
             <div className="text-3xl font-display italic text-white/20 mb-4">NO RECORDS FOUND</div>

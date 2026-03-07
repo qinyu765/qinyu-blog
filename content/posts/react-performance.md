@@ -1,8 +1,7 @@
 ---
 title: "OPTIMIZING RENDERING CYCLES"
-date: "2024.05.10"
+date: "2025.05.10"
 category: "TECH"
-coverImage: "https://picsum.photos/800/401"
 excerpt: "Deep dive into React.memo, useMemo, and useCallback to prevent unnecessary re-renders in complex dashboards."
 ---
 

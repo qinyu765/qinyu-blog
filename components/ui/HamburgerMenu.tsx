@@ -14,6 +14,13 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   navItems,
 }) => {
   const location = useLocation();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    // 短暂延迟后添加过渡动画类，防止初次渲染闪缩
+    const timer = setTimeout(() => setIsMounted(true), 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <>
@@ -21,8 +28,8 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
       <div
         className={`
           fixed inset-0 bg-p3dark/60 backdrop-blur-sm
-          transition-opacity duration-300
           z-[54]
+          ${isMounted ? 'transition-opacity duration-300' : ''}
           ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
         `}
         onClick={onToggle}
@@ -35,8 +42,9 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
           fixed top-0 right-0 h-screen w-64 max-w-[65vw]
           bg-p3dark/95 backdrop-blur-md
           border-l-2 border-p3cyan
-          transform transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]
+          transform
           z-[55]
+          ${isMounted ? 'transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]' : ''}
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
         role="navigation"
@@ -54,7 +62,18 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               <Link
                 key={item.path}
                 to={item.path}
-                onClick={onToggle}
+                onClick={(e) => {
+                  onToggle();
+                  const [pathPart, hashPart] = item.path.split('#');
+                  const path = pathPart || '/';
+                  if (location.pathname === path && location.hash === (hashPart ? `#${hashPart}` : '')) {
+                    if (hashPart) {
+                      document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }
+                }}
                 className={`
                   relative group block w-full
                   transform -skew-x-12 transition-all duration-300

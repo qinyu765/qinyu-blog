@@ -2,7 +2,6 @@
 title: "THE AESTHETICS OF INTERFACE"
 date: "2024.04.22"
 category: "TECH"
-coverImage: "https://picsum.photos/800/400"
 excerpt: "Exploring the diegetic UI design patterns found in modern RPGs and how to implement them in React."
 ---
 

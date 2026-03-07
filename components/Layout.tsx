@@ -9,7 +9,6 @@ import { Search } from "lucide-react";
 export const Layout: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [headerVisible, setHeaderVisible] = useState(true);
   const isSearchActive =
     location.pathname === "/blog" &&
     new URLSearchParams(location.search).get("search") === "1";
@@ -17,17 +16,6 @@ export const Layout: React.FC = () => {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-
-  useEffect(() => {
-    let lastY = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setHeaderVisible(y < lastY || y < 10);
-      lastY = y;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   useEffect(() => {
     if (isMobileMenuOpen) {
@@ -55,11 +43,7 @@ export const Layout: React.FC = () => {
       <BackgroundEffect />
 
       {/* 固定顶栏 */}
-      <header
-        className={`fixed top-0 left-0 right-0 z-50 py-2 px-8 flex items-center bg-p3black/90 backdrop-blur-[10px] border-b-2 border-p3blue transition-transform duration-300 ${
-          headerVisible ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
+      <header className="fixed top-0 left-0 right-0 z-50 py-2 px-8 flex items-center bg-p3black/60 backdrop-blur-lg border-b-2 border-p3blue">
         {/* 左侧 Logo + 状态指示器 */}
         <div className="hidden md:flex flex-1 min-w-0 items-center space-x-2 text-sm font-mono text-p3cyan tracking-wider">
           <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
@@ -105,7 +89,7 @@ export const Layout: React.FC = () => {
           ))}
           <div className="ml-10">
             <SkewButton to="/blog?search=1" hoverActive isActive={isSearchActive}>
-              <span className="flex items-center gap-1.5"><Search size={14} />SEARCH</span>
+              <span className="flex items-center gap-1.5"><Search size={14} />Search</span>
             </SkewButton>
           </div>
         </nav>

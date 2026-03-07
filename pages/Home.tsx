@@ -1,10 +1,95 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { BLOG_POSTS } from "../constants";
 import { ArrowRight, Star } from "lucide-react";
 import { P3RDialogUI } from "../components/P3RDialogUI";
 
+// 使用 import.meta.glob 自动获取 public/images/Favorites 下的所有文件
+// 键为形如 "/public/images/Favorites/LaLaLand_Movie.jpg" 的路径
+const favoritesFiles = import.meta.glob('/public/images/Favorites/*.{jpg,jpeg,png,gif,webp}', { eager: true });
+
+interface FavoriteGroup {
+  prefix: string;
+  images: string[];
+}
+
+interface CategoryGroup {
+  category: string;
+  groups: FavoriteGroup[];
+}
+
+const categorizedFavorites: CategoryGroup[] = [];
+
+Object.keys(favoritesFiles).forEach(filepath => {
+  // filepath like "/public/images/Favorites/LaLaLand_Movie.jpg"
+  const filename = filepath.split('/').pop();
+  if (!filename) return;
+  
+  // 按照 "_” 切割
+  const nameWithoutExt = filename.split('.')[0];
+  const parts = nameWithoutExt.split('_');
+  const category = parts.pop() || 'Other';
+  const prefix = parts[0] || nameWithoutExt; // 第一部分作为相同前缀判断依据
+  const imgSrc = filepath.replace('/public', '');
+
+  let categoryObj = categorizedFavorites.find(c => c.category === category);
+  if (!categoryObj) {
+    categoryObj = { category, groups: [] };
+    categorizedFavorites.push(categoryObj);
+  }
+
+  let groupObj = categoryObj.groups.find(g => g.prefix === prefix);
+  if (groupObj) {
+    groupObj.images.push(imgSrc);
+  } else {
+    categoryObj.groups.push({ prefix, images: [imgSrc] });
+  }
+});
+
+// 对外提供，为了保证分类展示顺序的一致性，按字母顺序进行排序
+categorizedFavorites.sort((a, b) => a.category.localeCompare(b.category));
+
 export const Home: React.FC = () => {
+  const location = useLocation();
+  const aboutRef = useRef<HTMLElement>(null);
+  const favoritesRef = useRef<HTMLElement>(null);
+  const [isAboutVisible, setIsAboutVisible] = useState(false);
+  const [isFavoritesVisible, setIsFavoritesVisible] = useState(false);
+
+  useEffect(() => {
+    if (location.hash === '#about' || location.hash === '#favorites') {
+      // 简单而粗暴的重试机制，确保组件完全挂载后能找到并滚动到 ref
+      const scrollAttempt = () => {
+        let targetRef = location.hash === '#about' ? aboutRef.current : favoritesRef.current;
+        if (targetRef) {
+          targetRef.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          setTimeout(scrollAttempt, 50);
+        }
+      };
+      // 等待初始渲染流完成
+      setTimeout(scrollAttempt, 100);
+    }
+  }, [location.hash, location.pathname]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.target.id === 'about') {
+            setIsAboutVisible(entry.isIntersecting);
+          } else if (entry.target.id === 'favorites') {
+            setIsFavoritesVisible(entry.isIntersecting);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    if (aboutRef.current) observer.observe(aboutRef.current);
+    if (favoritesRef.current) observer.observe(favoritesRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   if (!BLOG_POSTS.length) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] animate-in fade-in duration-700">
@@ -22,6 +107,16 @@ export const Home: React.FC = () => {
 
   const latestPost = BLOG_POSTS[0];
   const otherPosts = BLOG_POSTS.slice(1);
+
+  // 构造足够长的数据以支撑无限循环跑马灯，且前后两半必须完全相同
+  let base1 = [...otherPosts];
+  while (base1.length < 5) base1 = [...base1, ...otherPosts];
+  
+  let base2 = [...otherPosts].reverse();
+  while (base2.length < 5) base2 = [...base2, ...otherPosts].reverse();
+
+  const finalRow1 = [...base1, ...base1];
+  const finalRow2 = [...base2, ...base2];
 
   return (
     <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
@@ -89,41 +184,220 @@ export const Home: React.FC = () => {
           <div className="h-1 w-12 bg-p3cyan"></div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {otherPosts.map((post) => (
-            <Link
-              key={post.id}
-              to={`/blog/${post.id}`}
-              className="group relative block bg-p3dark/70 border-l-4 border-white hover:border-p3cyan transition-colors overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-p3blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden flex flex-col gap-6 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-16 md:before:w-32 before:bg-gradient-to-r before:from-p3dark before:to-transparent before:z-20 before:pointer-events-none after:absolute after:right-0 after:top-0 after:bottom-0 after:w-16 md:after:w-32 after:bg-gradient-to-l after:from-p3dark after:to-transparent after:z-20 after:pointer-events-none">
+          {/* Row 1 - Marquee Left */}
+          <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-6 px-4">
+            {finalRow1.map((post, index) => (
+              <Link
+                key={`row1-${post.id}-${index}`}
+                to={`/blog/${post.id}`}
+                className="w-[280px] md:w-[380px] shrink-0 group relative block bg-p3dark/70 border-l-4 border-white hover:border-p3cyan transition-colors overflow-hidden h-full"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-p3blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
-              <div className="p-6 relative z-10 flex flex-col h-full justify-between">
-                <div>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <Star size={12} className="text-p3red" />
-                    <span className="text-xs font-mono text-p3cyan">
-                      {post.date}
-                    </span>
+                <div className="p-6 relative z-10 flex flex-col h-full justify-between min-h-[200px]">
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Star size={12} className="text-p3red" />
+                      <span className="text-xs font-mono text-p3cyan">
+                        {post.date}
+                      </span>
+                    </div>
+                    <h4 className="text-xl font-bold uppercase mb-2 line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-sm text-p3mid/70 line-clamp-3">{post.excerpt}</p>
                   </div>
-                  <h4 className="text-xl font-bold uppercase mb-2">
-                    {post.title}
-                  </h4>
-                  <p className="text-sm text-p3mid/70">{post.excerpt}</p>
-                </div>
 
-                <div className="mt-4 flex items-center justify-end text-xs font-bold uppercase tracking-wider text-white/50 group-hover:text-white transition-colors">
-                  <span>Read Protocol</span>
-                  <ArrowRight
-                    size={14}
-                    className="ml-2 transform group-hover:translate-x-1 transition-transform"
-                  />
+                  <div className="mt-4 flex items-center justify-end text-xs font-bold uppercase tracking-wider text-white/50 group-hover:text-white transition-colors">
+                    <span>Read Protocol</span>
+                    <ArrowRight
+                      size={14}
+                      className="ml-2 transform group-hover:translate-x-1 transition-transform"
+                    />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
+
+          {/* Row 2 - Marquee Right */}
+          <div className="flex w-max animate-marquee-reverse hover:[animation-play-state:paused] gap-6 px-4">
+            {finalRow2.map((post, index) => (
+              <Link
+                key={`row2-${post.id}-${index}`}
+                to={`/blog/${post.id}`}
+                className="w-[280px] md:w-[380px] shrink-0 group relative block bg-p3dark/70 border-l-4 border-white hover:border-p3cyan transition-colors overflow-hidden h-full"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-p3blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                <div className="p-6 relative z-10 flex flex-col h-full justify-between min-h-[200px]">
+                  <div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <Star size={12} className="text-p3red" />
+                      <span className="text-xs font-mono text-p3cyan">
+                        {post.date}
+                      </span>
+                    </div>
+                    <h4 className="text-xl font-bold uppercase mb-2 line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-sm text-p3mid/70 line-clamp-3">{post.excerpt}</p>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-end text-xs font-bold uppercase tracking-wider text-white/50 group-hover:text-white transition-colors">
+                    <span>Read Protocol</span>
+                    <ArrowRight
+                      size={14}
+                      className="ml-2 transform group-hover:translate-x-1 transition-transform"
+                    />
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
+
+      {/* About Section */}
+      <div id="about" ref={aboutRef} className="scroll-mt-24 mt-16 md:mt-24">
+        <section 
+          className={`pb-24 transition-all duration-1000 ease-out transform ${
+            isAboutVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
+          }`}
+        >
+        {/* <div className="max-w-3xl mx-auto space-y-8 px-4 md:px-0"> */}
+          {/* Avatar + Title */}
+          <div className="flex items-center gap-6">
+            <div className="bg-gradient-to-b from-p3blue to-p3dark p-1 border-2 border-white transform -skew-x-6 shrink-0 shadow-lg">
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-p3dark relative overflow-hidden">
+                <img src="/images/user_admin.jpg" alt="Avatar" className="w-full h-full object-cover" loading="lazy" />
+              </div>
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-black italic tracking-wider">STATUS</h1>
+          </div>
+
+          {/* Info */}
+          <div className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-p3cyan/5 to-transparent opacity-0 transition-opacity duration-500 pointer-events-none" />
+            {/* <div className="space-y-6 text-p3white/90 font-light text-lg relative z-10 leading-relaxed">
+              <p>欢迎来到我的数字认知世界。我是一名前端工程师，专注于打造沉浸式的 Web 体验，模糊实用与艺术之间的边界。</p>
+              <p>本站致敬 Persona 3 Reload 的 UI 美学，完全基于 React 与 Tailwind CSS 构建。</p>
+            </div> */}
+
+            {/* Skill Matrix */}
+            <div className="relative z-10">
+              <h2 className="text-xl font-bold uppercase text-p3cyan mb-6 mt-3 flex items-center">
+                <span className="w-2 h-2 bg-white mr-3 shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                Skills
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[
+                  { name: 'React / React Native / Expo', width: '70%', desc: '使用 Expo 参与完成教育软件 步刻AI 等等项目开发，主要负责APP前端部分' },
+                  { name: 'Vue / uniapp', width: '70%', desc: '使用 Vue 进行项目前端开发，曾用 uniapp 开发跨端 线上商城 前端项目，着重小程序端开发；以及会议室门锁后台管理系统的前端开发' },
+                  { name: 'JavaScript / TypeScript', width: '65%', desc: '扎实的 JS 基础抽象能力，非常喜爱并习惯使用 TypeScript 进行类型安全的开发以减少潜在的边界边缘错误。' },
+                  { name: 'Python', width: '40%', desc: '熟悉其基本语法规则集，曾在日常生活中作为写自动化脚本、简单正则文本批处理和网络数据采集抓取的工具。' },
+                  { name: 'Node.js / Nest.js', width: '40%', desc: '能够用以开发服务化的 API 和工具脚手架层，对 Nest 生态的依赖注入与装饰器等抽象服务端设计有着基本了解。曾完成会议室门锁后台管理系统的后端部分' },
+                  { name: 'C / C++', width: '60%', desc: '作为我参与算法竞赛的主要语言；系统性地学习了底层开发概念，包括基础指针语法和内存的手动管理边界。' },
+                ].map((skill) => (
+                  <div 
+                    key={skill.name} 
+                    className="group bg-p3dark/60 rounded-xl p-5 border border-white/5 flex flex-col justify-between cursor-default relative overflow-hidden h-40 shadow-sm"
+                  >
+                    {/* 当前层内容 (鼠标移入时淡出，为悬浮卡让位) */}
+                    <div className="relative z-10 flex flex-col justify-between h-full bg-transparent group-hover:opacity-0 transition-opacity duration-300">
+                      <div className="flex justify-between items-start">
+                        <span className="font-medium tracking-wider text-p3white/90 pr-2">{skill.name}</span>
+                        <span className="text-white/30 font-mono font-bold select-none">{'>'}</span>
+                      </div>
+                      
+                      <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden relative shadow-inner mt-4">
+                        <div 
+                          className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-p3cyan/80 to-p3blue transition-all duration-[1500ms] ease-out rounded-full shadow-[0_0_8px_rgba(18,105,204,0.6)]" 
+                          style={{ width: isAboutVisible ? skill.width : '0%' }} 
+                        />
+                      </div>
+                    </div>
+
+                    {/* 悬浮介绍卡片 - 覆盖并从右下角顺时针旋转弹出 */}
+                    <div className="absolute inset-0 bg-slate-600/95 backdrop-blur-sm p-5 flex flex-col justify-center rounded-xl z-20 
+                                  opacity-0 translate-y-4 translate-x-4 -rotate-12 scale-95 origin-bottom-right pointer-events-none
+                                  transition-all duration-300 ease-out
+                                  group-hover:opacity-100 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:rotate-0 group-hover:scale-100 group-hover:pointer-events-auto">
+                      <span className="font-bold text-white mb-3 text-base">{skill.name}</span>
+                      <p className="text-white/90 text-sm font-light leading-relaxed line-clamp-5">
+                        {skill.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        {/* </div> */}
+        </section>
+      </div>
+
+      {/* Favorites Section */}
+      <div id="favorites" ref={favoritesRef} className="scroll-mt-8">
+        <section 
+          className={`pb-24 transition-all duration-1000 ease-out transform ${
+            isFavoritesVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-16"
+          }`}
+        >
+        {/* <div className="flex items-center gap-6 mb-12">
+            <div className="bg-gradient-to-b from-p3cyan to-p3blue p-1 border-2 border-white transform skew-x-6 shrink-0 shadow-lg flex items-center justify-center w-20 h-20 md:w-24 md:h-24">
+               <Star size={40} className="text-p3dark animate-pulse absolute" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-display font-black italic tracking-wider uppercase">Favorites</h1>
+        </div> */}
+
+        <div className="space-y-16 mt-8">
+          {categorizedFavorites.map((categoryData) => (
+             <div key={categoryData.category} className="space-y-6">
+                {/* 类别标题 */}
+                <h2 className="text-3xl md:text-4xl font-display font-black tracking-wider text-white/80 uppercase border-b border-white/10 pb-4 inline-block pr-12">
+                  {categoryData.category}
+                </h2>
+                
+                {/* 类别下的图片卡片组展示区域 */}
+                <div className="flex flex-wrap gap-14 pl-2">
+                  {categoryData.groups.map((group, idx) => (
+                    <div key={idx} className="relative group perspective-1000 w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 shrink-0">
+                      {group.images.map((imgSrc, imgIdx) => {
+                        const isMultiple = group.images.length > 1;
+                        const zIndex = 10 - imgIdx;
+                        // 多图片时制造默认的紧凑偏移错位
+                        const offsetBase = isMultiple ? imgIdx * 10 : 0;
+                        const defaultRotate = isMultiple ? (imgIdx === 0 ? '-2deg' : imgIdx === 1 ? '3deg' : '-1deg') : '0deg';
+                        
+                        // 鼠标悬浮时向右下方如扇子般展开铺开
+                        const hoverTranslateX = isMultiple ? imgIdx * 80 : 0;
+                        const hoverTranslateY = isMultiple ? imgIdx * 20 : 0;
+                        const hoverRotate = isMultiple ? imgIdx * 6 : 0;
+
+                        return (
+                          <div 
+                            key={imgIdx} 
+                            className="absolute inset-0 rounded-xl overflow-hidden border-2 border-white/20 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:shadow-[0_0_20px_rgba(18,105,204,0.4)] [transform:var(--default-transform)] group-hover:[transform:var(--hover-transform)] bg-p3dark"
+                            style={{
+                              zIndex,
+                              '--default-transform': `translate(${offsetBase}px, ${offsetBase}px) rotate(${defaultRotate})`,
+                              '--hover-transform': `translate(${hoverTranslateX}px, ${hoverTranslateY}px) rotate(${hoverRotate}deg)`
+                            } as React.CSSProperties}
+                          >
+                             <img src={imgSrc} alt={group.prefix} className="w-full h-full object-cover" loading="lazy" />
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+             </div>
+          ))}
+        </div>
+        </section>
+      </div>
     </div>
   );
 };

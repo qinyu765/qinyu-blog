@@ -7,6 +7,7 @@ export const TOPICS: Topic[] = loadTopics();
 export const NAV_ITEMS = [
   { label: 'HOME', path: '/' },
   { label: 'BLOG', path: '/blog' },
-  { label: 'TOPICS', path: '/topics' },
-  { label: 'ABOUT', path: '/about' },
+  // { label: 'TOPICS', path: '/topics' },
+  { label: 'ABOUT', path: '/#about' },
+  { label: 'FAVORITES', path: '/#favorites' },
 ];

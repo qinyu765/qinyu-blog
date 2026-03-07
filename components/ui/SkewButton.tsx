@@ -13,6 +13,20 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ to, children, isActive, 
   const [targetPath] = to.split('?');
   const active = isActive !== undefined ? isActive : location.pathname === targetPath;
 
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const [pathPart, hashPart] = to.split('#');
+    const path = pathPart || '/';
+    
+    // 如果想要跳转的地址与目前所在地址（包括 Hash）完全一致，React Router 默认不会触发重绘与更新，此处手动接管滚动
+    if (location.pathname === path && location.hash === (hashPart ? `#${hashPart}` : '')) {
+      if (hashPart) {
+        document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  };
+
   const bgClass = active
     ? 'bg-white border-p3blue'
     : hoverActive
@@ -26,7 +40,12 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ to, children, isActive, 
       : 'text-white group-hover:text-p3cyan';
 
   return (
-    <Link to={to} aria-current={active ? "page" : undefined} className="relative group block transition-transform duration-200 ease-out hover:-translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark">
+    <Link 
+      to={to} 
+      onClick={handleClick}
+      aria-current={active ? "page" : undefined} 
+      className="relative group block transition-transform duration-200 ease-out hover:-translate-y-[2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+    >
       <div
         className={`
           absolute inset-0 transform -skew-x-12 transition-all duration-200 ease-out

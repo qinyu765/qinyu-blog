@@ -15,6 +15,14 @@ dist-ssr
 # Env files
 .env
 .env.*
+!.env.example
+
+# Temp screenshots / debug assets
+/*.png
+
+# Misc local files
+/class.html
+/metadata.json
 
 # Tooling caches
 .vite

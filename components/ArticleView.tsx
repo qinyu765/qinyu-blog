@@ -71,7 +71,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
   }, [post.title]);
 
   return (
-    <div className="relative max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="relative max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full min-w-0">
       <article>
         <div className="flex justify-between items-center mb-8">
           <Link to={backLink.to} className="group flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-white/60 hover:text-p3cyan transition-colors">

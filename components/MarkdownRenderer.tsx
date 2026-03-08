@@ -121,7 +121,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             }
             return (
               <code
-                className="bg-p3dark/60 text-p3cyan font-mono px-2 py-1 text-sm"
+                className="bg-p3dark/60 text-p3cyan font-mono px-2 py-1 text-sm break-all"
                 {...props}
               >
                 {children}

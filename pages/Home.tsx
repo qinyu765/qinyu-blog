@@ -56,6 +56,8 @@ export const Home: React.FC = () => {
   const [isAboutVisible, setIsAboutVisible] = useState(false);
   const [isFavoritesVisible, setIsFavoritesVisible] = useState(false);
   const [expandedSkill, setExpandedSkill] = useState<number | null>(null);
+  // 记录当前鼠标悬浮的图片组，用于翻转层叠顺序
+  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
 
   useEffect(() => {
     if (location.hash === '#about' || location.hash === '#favorites') {
@@ -327,11 +329,11 @@ export const Home: React.FC = () => {
                     <div className={`absolute inset-0 bg-slate-600/95 backdrop-blur-sm p-5 flex flex-col justify-center rounded-xl z-20 
                                   transition-all duration-300 ease-out
                                   ${isExpanded 
-                                    ? 'opacity-100 translate-x-0 translate-y-0 rotate-0 scale-100 pointer-events-auto' 
-                                    : 'opacity-0 translate-y-4 translate-x-4 -rotate-12 scale-95 origin-bottom-right pointer-events-none'
+                                    ? 'opacity-100 scale-100 pointer-events-auto' 
+                                    : 'opacity-0 scale-95 pointer-events-none'
                                   }
-                                  md:opacity-0 md:translate-y-4 md:translate-x-4 md:-rotate-12 md:scale-95 md:pointer-events-none
-                                  md:group-hover:opacity-100 md:group-hover:translate-x-0 md:group-hover:translate-y-0 md:group-hover:rotate-0 md:group-hover:scale-100 md:group-hover:pointer-events-auto`}>
+                                  md:opacity-0 md:scale-95 md:pointer-events-none
+                                  md:group-hover:opacity-100 md:group-hover:scale-100 md:group-hover:pointer-events-auto`}>
                       <span className="font-bold text-white mb-3 text-base">{skill.name}</span>
                       <p className="text-white/90 text-sm font-light leading-relaxed line-clamp-5">
                         {skill.desc}
@@ -371,36 +373,49 @@ export const Home: React.FC = () => {
                 
                 {/* 类别下的图片卡片组展示区域 */}
                 <div className="flex flex-wrap gap-14 pl-2">
-                  {categoryData.groups.map((group, idx) => (
-                    <div key={idx} className="relative group perspective-1000 w-56 h-56 sm:w-56 sm:h-56 md:w-64 md:h-64 shrink-0">
+                  {categoryData.groups.map((group, idx) => {
+                    const groupKey = `${categoryData.category}-${idx}`;
+                    const isHovered = hoveredGroup === groupKey;
+                    const isMultiple = group.images.length > 1;
+
+                    return (
+                    <div 
+                      key={idx} 
+                      className="relative perspective-1000 w-56 h-56 sm:w-56 sm:h-56 md:w-64 md:h-64 shrink-0"
+                      style={{ cursor: isMultiple ? 'pointer' : 'default' }}
+                      onMouseEnter={() => isMultiple && setHoveredGroup(groupKey)}
+                      onMouseLeave={() => setHoveredGroup(null)}
+                    >
                       {group.images.map((imgSrc, imgIdx) => {
-                        const isMultiple = group.images.length > 1;
-                        const zIndex = 10 - imgIdx;
+                        // hover 时反转层叠顺序：底层图片浮到顶层
+                        const zIndex = isHovered 
+                          ? imgIdx  // 反转：最后一张 z 最高
+                          : (10 - imgIdx);  // 默认：第一张 z 最高
+                        
                         // 多图片时制造默认的紧凑偏移错位
                         const offsetBase = isMultiple ? imgIdx * 10 : 0;
                         const defaultRotate = isMultiple ? (imgIdx === 0 ? '-2deg' : imgIdx === 1 ? '3deg' : '-1deg') : '0deg';
-                        
-                        // 鼠标悬浮时向右下方如扇子般展开铺开
-                        const hoverTranslateX = isMultiple ? imgIdx * 80 : 0;
-                        const hoverTranslateY = isMultiple ? imgIdx * 20 : 0;
-                        const hoverRotate = isMultiple ? imgIdx * 6 : 0;
 
                         return (
                           <div 
                             key={imgIdx} 
-                            className="absolute inset-0 rounded-xl overflow-hidden border-2 border-white/20 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:shadow-[0_0_20px_rgba(18,105,204,0.4)] [transform:var(--default-transform)] group-hover:[transform:var(--hover-transform)] bg-p3dark"
+                            className="absolute inset-0 rounded-xl overflow-hidden border-2 border-white/20 shadow-xl transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] bg-p3dark"
                             style={{
                               zIndex,
-                              '--default-transform': `translate(${offsetBase}px, ${offsetBase}px) rotate(${defaultRotate})`,
-                              '--hover-transform': `translate(${hoverTranslateX}px, ${hoverTranslateY}px) rotate(${hoverRotate}deg)`
-                            } as React.CSSProperties}
+                              transition: 'z-index 0s, transform 0.5s cubic-bezier(0.23,1,0.32,1), box-shadow 0.5s',
+                              transform: `translate(${offsetBase}px, ${offsetBase}px) rotate(${defaultRotate})`,
+                              boxShadow: isHovered && imgIdx === group.images.length - 1
+                                ? '0 0 20px rgba(18,105,204,0.4)'
+                                : undefined,
+                            }}
                           >
                              <img src={imgSrc} alt={group.prefix} className="w-full h-full object-cover" loading="lazy" />
                           </div>
                         );
                       })}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
              </div>
           ))}

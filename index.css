@@ -23,6 +23,13 @@ body {
   overflow-x: hidden;
 }
 
+/* Markdown 内容区域溢出控制 */
+.markdown-content {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
+}
+
 /* 尊重用户的"减少动画"偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

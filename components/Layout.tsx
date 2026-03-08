@@ -39,7 +39,7 @@ export const Layout: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   return (
-    <div className="min-h-screen relative font-body text-white selection:bg-p3cyan selection:text-black">
+    <div className="min-h-screen relative font-body text-white selection:bg-p3cyan selection:text-black overflow-x-hidden">
       <BackgroundEffect />
 
       {/* 固定顶栏 */}

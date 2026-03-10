@@ -5,6 +5,8 @@ category: "TECH"
 excerpt: "通过手写迷你 React，拆解 Fiber、Reconciliation 与 Hooks 的核心原理"
 ---
 
+来源：[Build Your Own React](https://pomb.us/build-your-own-react/)
+
 如果有人问我"学 React 最有效的方式是什么"，我会给出一个听起来有点反直觉的答案：不要去学 React，去写一个 React。Rodrigo Pomber 的那篇 Build Your Own React 正是做了这件事——用不到 300 行代码，从零构建了一个叫 Didact 的迷你框架，覆盖了 React 16.8 以来最核心的架构设计。我花了一些时间把它通读消化，发现这篇文章几乎回答了前端面试里关于 React 原理的所有高频问题。以下是我从中提炼出的理解。
 
 ## JSX 与 createElement：一切始于一个普通对象

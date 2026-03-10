@@ -7,10 +7,14 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output
 dist
 dist-ssr
 *.local
+.vercel
 
 # Env files
 .env
@@ -29,6 +33,9 @@ dist-ssr
 .eslintcache
 coverage
 
+# Playwright
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -40,6 +47,12 @@ coverage
 *.sln
 *.sw?
 
-# Local app data
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Local app data / AI tooling
 .obsidian/
 .claude/
+.agents/

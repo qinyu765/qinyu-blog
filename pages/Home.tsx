@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { BLOG_POSTS } from "../constants";
 import { ArrowRight, Star } from "lucide-react";
 import { P3RDialogUI } from "../components/P3RDialogUI";
+import { useSEO } from "../lib/use-seo";
 
 // 使用 import.meta.glob 自动获取 public/images/Favorites 下的所有文件
 // 键为形如 "/public/images/Favorites/LaLaLand_Movie.jpg" 的路径
@@ -50,6 +51,7 @@ Object.keys(favoritesFiles).forEach(filepath => {
 categorizedFavorites.sort((a, b) => a.category.localeCompare(b.category));
 
 export const Home: React.FC = () => {
+  useSEO({ title: '首页', description: 'HF 的技术博客 — 前端开发、React、TypeScript 技术分享与实践记录', path: '/' });
   const location = useLocation();
   const aboutRef = useRef<HTMLElement>(null);
   const favoritesRef = useRef<HTMLElement>(null);

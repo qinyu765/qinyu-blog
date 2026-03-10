@@ -2,11 +2,18 @@ import React from 'react';
 import { useParams, Navigate } from 'react-router-dom';
 import { BLOG_POSTS } from '../constants';
 import { ArticleView } from '../components/ArticleView';
+import { useSEO } from '../lib/use-seo';
 
 export const BlogPost: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const postIndex = BLOG_POSTS.findIndex((p) => p.id === id);
   const post = postIndex !== -1 ? BLOG_POSTS[postIndex] : undefined;
+
+  useSEO({
+    title: post?.title ?? 'Blog',
+    description: post?.excerpt,
+    path: post ? `/blog/${post.id}` : '/blog',
+  });
 
   if (!post) return <Navigate to="/" replace />;
 

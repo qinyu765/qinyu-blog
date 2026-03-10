@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { BLOG_POSTS } from "../constants";
 import { Search, X } from "lucide-react";
 import Fuse from "fuse.js";
+import { useSEO } from "../lib/use-seo";
 
 const fuse = new Fuse(BLOG_POSTS, {
   keys: [
@@ -16,6 +17,7 @@ const fuse = new Fuse(BLOG_POSTS, {
 });
 
 export const BlogList: React.FC = () => {
+  useSEO({ title: 'Blog', description: '所有文章列表 — 前端技术分享与实践', path: '/blog' });
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);

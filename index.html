@@ -3,7 +3,35 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HF</title>
+    <title>HF's Blog | 前端技术分享</title>
+    <meta name="description" content="HF 的技术博客 — 前端开发、React、TypeScript 技术分享与实践记录">
+    <meta name="keywords" content="前端开发, React, TypeScript, 技术博客, JavaScript">
+    <meta property="og:title" content="HF's Blog">
+    <meta property="og:description" content="前端技术分享与实践记录">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hflin.xyz">
+    <meta name="twitter:card" content="summary">
+    <!-- GitHub Pages SPA redirect restore -->
+    <script>
+      (function(){
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+      })();
+      // Restore route from 404.html query-string hack
+      (function(l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location));
+    </script>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' fill='none'%3E%3Cg transform='skewX(-12)' transform-origin='32 32'%3E%3Cpath d='M20 20 L28 20 L32 44 L26 44 Z' fill='%23F0F0F0'/%3E%3Cpath d='M44 20 L36 20 L34 36 L40 36 Z' fill='%231269CC'/%3E%3Ccircle cx='32' cy='50' r='2.5' fill='%231269CC'/%3E%3Cline x1='26' y1='44' x2='32' y2='50' stroke='%231269CC' stroke-width='1.5'/%3E%3Cline x1='34' y1='36' x2='32' y2='50' stroke='%231269CC' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

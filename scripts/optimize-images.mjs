@@ -10,6 +10,9 @@ import { readdir, stat, mkdir, unlink } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// 禁用 sharp 文件缓存，防止 Windows 上 EBUSY 导致无法删除原文件
+sharp.cache(false);
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_IMAGES = path.join(ROOT, 'public', 'images');

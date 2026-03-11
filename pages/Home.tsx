@@ -353,13 +353,13 @@ export const Home: React.FC = () => {
 
                     {/* 悬浮/展开介绍卡片 */}
                     <div className={`absolute inset-0 bg-slate-600/95 backdrop-blur-sm p-5 flex flex-col justify-center rounded-xl z-20 
-                                  transition-all duration-300 ease-out
+                                  transition-all duration-300 ease-out origin-bottom-right
                                   ${isExpanded 
                                     ? 'opacity-100 scale-100 pointer-events-auto' 
                                     : 'opacity-0 scale-95 pointer-events-none'
                                   }
-                                  md:opacity-0 md:scale-95 md:pointer-events-none
-                                  md:group-hover:opacity-100 md:group-hover:scale-100 md:group-hover:pointer-events-auto`}>
+                                  md:opacity-0 md:pointer-events-none md:-rotate-12 md:translate-x-[-10%] md:translate-y-[10%]
+                                  md:group-hover:opacity-100 md:group-hover:rotate-0 md:group-hover:translate-x-0 md:group-hover:translate-y-0 md:group-hover:scale-100 md:group-hover:pointer-events-auto`}>
                       <span className="font-bold text-white mb-3 text-base">{skill.name}</span>
                       <p className="text-white/90 text-sm font-light leading-relaxed line-clamp-5">
                         {skill.desc}

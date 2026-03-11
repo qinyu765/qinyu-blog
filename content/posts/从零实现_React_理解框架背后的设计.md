@@ -65,5 +65,3 @@ function useState(initial) {
 ## 从 Didact 看真实 React
 
 Didact 刻意使用了与真实 React 源码相同的变量名和函数名。如果你在浏览器里给一个函数组件打断点，你会在调用栈里看到 `workLoop`、`performUnitOfWork`、`updateFunctionComponent` 这些一模一样的名字。当然，真实 React 在 Didact 的基础上还有大量的优化和功能是这 300 行代码覆盖不到的：用 `key` 优化列表 diff、`useEffect` 和其他 Hooks 的实现、`className`/`style` 等特殊 props 的处理、对 `<Fragment>` 等特殊组件的支持，以及整套优先级调度机制。但 Didact 给出的骨架已经足够清晰——Fiber 树的构建与遍历、两阶段提交、基于 type 的 Reconciliation、基于数组索引的 Hooks——真实 React 的每一个复杂特性都是在这个骨架上长出来的。
-
-读完这篇文章之后再去看面试题，会有一种"答案就在题目里"的感觉。因为你理解了那套机制本身，而不只是背住了什么。当面试官问"React 的 diff 算法是怎么工作的"，你不需要背诵三条规则，你可以从 Reconciliation 函数的那个 while 循环讲起，讲 `sameType` 的判断，讲 `effectTag` 的标记，讲 Commit 阶段怎么根据这些标记操作 DOM。这种理解的深度，是任何八股文背诵替代不了的。

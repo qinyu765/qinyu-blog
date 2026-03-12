@@ -346,8 +346,11 @@ export const Home: React.FC = () => {
                       
                       <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden relative shadow-inner mt-4">
                         <div 
-                          className="absolute top-0 bottom-0 left-0 bg-gradient-to-r from-p3cyan/80 to-p3blue transition-all duration-[1500ms] ease-out rounded-full shadow-[0_0_8px_rgba(18,105,204,0.6)]" 
-                          style={{ width: isAboutVisible ? skill.width : '0%' }} 
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-p3cyan/80 to-p3blue rounded-full shadow-[0_0_8px_rgba(18,105,204,0.6)] transition-transform duration-[1500ms] ease-out will-change-transform origin-left" 
+                          style={{ 
+                            width: skill.width,
+                            transform: isAboutVisible ? 'scaleX(1)' : 'scaleX(0)',
+                          }} 
                         />
                       </div>
                     </div>

@@ -9,10 +9,12 @@
     "build": "next build",
     "postbuild": "node scripts/build-feed.mjs",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "mcp": "tsx mcp-server/index.ts"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.562.0",
@@ -21,7 +23,8 @@
     "react-dom": "^19.2.3",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^15.6.1",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -30,6 +33,7 @@
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "~5.8.2"
   },
   "packageManager": "pnpm@10.26.2+sha512.0e308ff2005fc7410366f154f625f6631ab2b16b1d2e70238444dd6ae9d630a8482d92a451144debc492416896ed16f7b114a86ec68b8404b2443869e68ffda6"

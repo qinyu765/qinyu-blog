@@ -39,10 +39,13 @@ export const FavoritesSection: React.FC<FavoritesSectionProps> = ({ favorites: c
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
-          setIsVisible(entry.isIntersecting);
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect(); // 单向触发：显示后不再隐藏
+          }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
     if (favoritesRef.current) observer.observe(favoritesRef.current);
     return () => observer.disconnect();

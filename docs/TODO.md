@@ -4,6 +4,52 @@
 
 ---
 
+## 最新分析（2026-06-08）
+
+> 本节为最近一次代码巡检得出的"急需优化"短清单，按收益/风险比排序。
+> 详细 backlog 仍维护在下方 P1~P4 章节，本节仅做指引与新增项登记。
+
+### 高优先级（建议优先处理）
+
+1. **`blog-loader.ts` 重复扫盘 + 重复解析** 🆕
+   - `loadBlogPosts()` / `loadTopics()` 无任何缓存。文章详情路由的 `generateStaticParams`、`generateMetadata`、默认 `Page` 三个函数各调用一次，topics 三级路由同理。SSG 构建时，每篇文章都会触发数十次全量目录扫描与 `gray-matter` 解析。
+   - **改法**：在 `src/lib/blog-loader.ts` 加模块级 `let cache: BlogPost[] | null`，首次加载后复用；dev 模式可按文件 mtime 失效。
+   - 风险低、改动局限于单文件，构建时长立竿见影下降。
+
+2. **`react-syntax-highlighter` 把整个 PrismJS 打入 bundle** ↘ 见 P3
+   - `MarkdownRenderer.tsx` 从 `dist/cjs/styles/prism` 引入 `vscDarkPlus` + Prism 主体，导致**所有语言定义**进入首屏 JS。
+   - **改法**（任选其一）：
+     - `PrismAsyncLight` + 仅 `registerLanguage` 实际用到的（ts/js/bash/md/css 等）；
+     - 用 `next/dynamic` 把代码块组件懒加载；
+     - 切换 `shiki` 在构建期把高亮做成静态 HTML，运行时 0 JS（推荐）。
+
+3. **Google Fonts 外链阻塞首屏** 🆕
+   - `src/app/layout.tsx:36` 直接 `<link>` 到 `fonts.googleapis.com`，未子集化、未指定 `font-display`、依赖国外 CDN。
+   - **改法**：改用 `next/font/google` 的 `Anton` / `Noto_Sans_SC` / `Roboto_Condensed`，自动自托管 + 子集化 + 零 CLS。
+
+### 中优先级
+
+4. **`ArticleView` 滚动监听强制 layout** ↘ 见 P3
+   - `src/components/ArticleView.tsx:37-51` 每次 rAF 都对全部 heading 调 `getBoundingClientRect`。长文章可感卡顿。
+   - **改法**：改 `IntersectionObserver`，注册一次即可。
+
+5. **`LayoutShell` 整体被 `'use client'` 污染** 🆕
+   - 顶栏 breadcrumb、导航壳全部位于客户端组件内。breadcrumb 渲染可在 server 端完成。
+   - **改法**：把交互部分（汉堡菜单、search 高亮）抽成小的 client 子组件，让 `LayoutShell` 本身回到 server。
+
+6. **`HomeClient` hash 锚点用 `setTimeout` 自旋轮询** 🆕
+   - `src/app/HomeClient.tsx:23-37` 每 50ms 重试找元素，写法脏且不可靠。
+   - **改法**：`useLayoutEffect` + `scrollIntoView`，或交由浏览器原生 hash 滚动处理。
+
+### 低优先级（可顺手）
+
+- `BackgroundEffect` 7 条 ripple + caustics + noise 持续动画，移动端 CPU 偏高；建议移动端裁剪 ripple 数量，或加 `content-visibility: auto`。
+- `FavoritesSection` / `AboutSection` 各自实现 IntersectionObserver，抽出公共 `useInView` hook。
+- `<img>` 多处缺 `width / height`（logo、`user_admin.webp`、favorites 图）会有 CLS。
+- 尚未引入 ESLint / prettier / 测试，`package.json` 的 `lint` 脚本仅是 `next lint` 占位。↘ 见 P2
+
+---
+
 ## P1 — 代码质量
 
 - [x] **拆分 `Home.tsx`（480+ 行巨型组件）**
@@ -30,6 +76,11 @@
 - [x] **Frontmatter 解析升级**
   - 已从简易正则解析器迁移至 `gray-matter`，支持完整 YAML frontmatter
   - 待办：schema 校验（zod）和 `draft: true` 过滤
+
+- [ ] **`blog-loader` 增加模块级缓存** 🆕 2026-06-08
+  - 当前 `loadBlogPosts()` / `loadTopics()` 每次都重读磁盘 + 解析。详情路由的三个函数（`generateStaticParams` / `generateMetadata` / `Page`）会重复调用，构建期成本被放大。
+  - 建议加模块级 `cache` 变量，首次加载后复用；dev 模式可用 mtime 失效。
+  - 涉及文件：`src/lib/blog-loader.ts`
 
 - [x] **同步项目文档与实际实现** — 已在 Next.js 迁移后更新 `AGENTS.md`
 
@@ -102,16 +153,29 @@
   - 默认折叠（按钮触发）或滚动到可视区再加载，减少第三方脚本开销
 
 - [ ] **TOC active heading 用 IntersectionObserver**
-  - `ArticleView.tsx`：当前仍用 scroll + rAF + `getBoundingClientRect`（第 37-59 行），待改为 IntersectionObserver
+  - `ArticleView.tsx`：当前仍用 scroll + rAF + `getBoundingClientRect`（第 37-59 行），每次回调都触发 forced layout，长文体感卡顿。
+  - 改为 `IntersectionObserver` 注册一次，回调里维护 `activeId` 即可。
 
-- [ ] **`react-syntax-highlighter` 按需加载语言**
-  - 当前全量加载 Prism 语言定义
-  - 改为仅注册 `tsx`、`js`、`css`、`bash` 等常用语言
+- [ ] **`react-syntax-highlighter` 按需加载语言** 🔴
+  - 当前 `MarkdownRenderer.tsx` 使用 `Prism`（CJS 全量）+ `vscDarkPlus` 样式，所有语言定义随首屏 JS 一同下发。
+  - 备选改法（按推荐顺序）：
+    1. 切换 `shiki` 在构建期生成静态高亮 HTML（运行时 0 JS）；
+    2. `PrismAsyncLight` + `registerLanguage` 仅注册实际用到的（ts/js/bash/md/css 等）；
+    3. 用 `next/dynamic` 把代码块组件懒加载到正文出现后再下发。
+
+- [ ] **Google Fonts 改用 `next/font/google`** 🆕 2026-06-08 🔴
+  - 当前 `src/app/layout.tsx:36` 直接 `<link>` 到 Google CDN，未子集化、未指定 `font-display`，首屏阻塞且依赖外部网络。
+  - 改用 `next/font/google` 自动自托管 + 子集化 + 零 CLS，删除手动 `preconnect`。
 
 - [x] **文章正文按需加载** — Next.js SSG 每页独立构建，无需手动分割
 
+- [ ] **`LayoutShell` 拆分 server / client** 🆕 2026-06-08
+  - 当前 `src/components/LayoutShell.tsx` 整体 `'use client'`，导致所有页面被客户端组件包裹，breadcrumb 也在客户端渲染。
+  - 把交互部分（汉堡菜单、search 高亮指示器）抽成独立的 client 子组件，让 `LayoutShell` 本身回到 server，由 `template.tsx` 直接使用。
+
 - [ ] **动效支持 `prefers-reduced-motion`**
-  - 对跑马灯/背景等高频动画提供降级，兼顾可访问性与低端设备
+  - 对跑马灯/背景等高频动画提供降级，兼顾可访问性与低端设备。
+  - 注：`globals.css` 已有全局降级，但跑马灯/`BackgroundEffect` 内联 `<style>` 内的动画未被覆盖，需要单独处理。
 
 ---
 
@@ -139,7 +203,11 @@
 ## 小改进
 
 - [ ] `SkewButton` 增加 `-webkit-font-smoothing: antialiased`
-- [x] ~~hash 锚点滚动已重构~~ — `HomeClient.tsx` 使用 `setTimeout` 递归重试，scroll handler 节流已使用 rAF
+- [ ] **`HomeClient` hash 锚点重写** 🆕 2026-06-08
+  - 当前 `HomeClient.tsx:23-37` 用 `setTimeout` 50ms 递归自旋查找元素，写法脏且时序不可靠。
+  - 改为 `useLayoutEffect` + `scrollIntoView`，或直接交给浏览器原生 hash 滚动。
 - [ ] `ArticleView.tsx:70` 中 `scrollToHeading` 800ms 硬编码改用 `scrollend` 事件
 - [ ] Favorites 图片的 `alt` 属性优化为更有语义的描述
 - [ ] 分享复制兜底：`navigator.clipboard` 不可用时给出更友好提示/降级方案
+- [ ] 多处 `<img>` 缺 `width / height` 属性会产生 CLS（logo、`user_admin.webp`、favorites 图）
+- [ ] 抽出公共 `useInView` hook，合并 `FavoritesSection` / `AboutSection` 中重复的 IntersectionObserver 逻辑

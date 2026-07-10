@@ -54,5 +54,7 @@ Desktop.ini
 # Local app data / AI tooling
 .obsidian/
 .claude/
+.claude
 .agents/
+.playwright-cli/
 docs/要点整理.md

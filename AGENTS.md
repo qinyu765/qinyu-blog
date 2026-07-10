@@ -1,6 +1,6 @@
 # AGENTS.md
 
-本文件为 AI 编码助手（Gemini / Claude / Antigravity 等）提供项目上下文指引。
+本文件为 AI 编码助手（Gemini / Claude / Antigravity 等）提供项目上下文指引，是本项目 AI 上下文的**唯一事实源**。`CLAUDE.md` 为指向本文件的软连接，请勿单独维护第二份。
 
 ---
 
@@ -29,6 +29,8 @@ node scripts/optimize-images.mjs
 ```
 
 > 未配置测试框架或 linter。
+>
+> **注意：** 用户终端通常已在 `http://localhost:3000/` 常驻运行 `pnpm dev`，**不要**自行启动新的 dev server。
 
 ---
 
@@ -218,3 +220,32 @@ tags: ["tag1", "tag2"]     # 可选
 - Server Component 和 Client Component 分离（`'use client'` 指令）
 - 新代码注释使用中文
 - Commit message 使用中文描述
+
+---
+
+## AI Skills（Agent 技能）
+
+本项目通过 [`vercel-labs/skills`](https://github.com/vercel-labs/skills) 生态管理可复用的 Agent 技能，安装记录锁定在根目录 `skills-lock.json`（已纳入版本控制），技能文件安装在 `.agents/skills/`（对应 `.claude/skills/`，二者为同一目录，均在 `.gitignore` 中）。
+
+### 已装技能（贴合本项目技术栈）
+
+| 技能 | 来源 | 用途 |
+|------|------|------|
+| `react-best-practices` | `vercel-labs/agent-skills` | Vercel 工程团队的 React + Next.js 性能优化准则（40+ 规则，按影响力分级）：消除请求瀑布、Bundle 瘦身、Server/Client 组件划分、重渲染优化等。 |
+| `web-design-guidelines` | `vercel-labs/agent-skills` | Web 视觉与交互设计规范。契合本站 P3R 视觉风格的组件设计与打磨。 |
+
+> 说明：旧的 `next-best-practices`（`vercel-labs/next-skills`）已被上游废弃，故不再使用；Next.js 官方 `next-cache-components-*` 面向 server 运行时，与本项目「纯静态导出（`output: 'export'`）」不匹配，未安装。
+
+### 恢复 / 更新技能
+
+```bash
+# 首次克隆后，按 skills-lock.json 还原全部技能（等价于 npm ci）
+npx skills experimental_install
+
+# 新增技能（会自动写入 skills-lock.json）
+npx skills add vercel-labs/agent-skills -s react-best-practices
+
+# 检查 / 更新
+npx skills check
+npx skills update
+```

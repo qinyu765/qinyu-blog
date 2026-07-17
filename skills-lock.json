@@ -12,6 +12,18 @@
       "sourceType": "github",
       "skillPath": "skills/web-design-guidelines/SKILL.md",
       "computedHash": "f3bc47f890f42a44db1007ab390709ec368e4b8c089baee6b0007182236ac474"
+    },
+    "web-performance": {
+      "source": "minorcell/minorcell-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-performance/SKILL.md",
+      "computedHash": "d283bb40bd682f805d4db442f706c3cce5b8a5a4a7605200bb400ea355984dcb"
+    },
+    "writing-blog": {
+      "source": "minorcell/minorcell-skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-blog/SKILL.md",
+      "computedHash": "5efefee847369271801d2980bbdce2e1d13a7c406b88a6b12f06249df1d4d5e3"
     }
   }
 }

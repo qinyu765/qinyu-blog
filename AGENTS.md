@@ -233,8 +233,12 @@ tags: ["tag1", "tag2"]     # 可选
 |------|------|------|
 | `react-best-practices` | `vercel-labs/agent-skills` | Vercel 工程团队的 React + Next.js 性能优化准则（40+ 规则，按影响力分级）：消除请求瀑布、Bundle 瘦身、Server/Client 组件划分、重渲染优化等。 |
 | `web-design-guidelines` | `vercel-labs/agent-skills` | Web 视觉与交互设计规范。契合本站 P3R 视觉风格的组件设计与打磨。 |
+| `web-performance` | `minorcell/minorcell-skills` | 面向本地代码层面的 Web 性能审查清单，适合本项目的静态导出、图片资源、字体加载、CLS 与 Core Web Vitals 优化。 |
+| `writing-blog` | `minorcell/minorcell-skills` | 面向博客写作与文章打磨的工作流，贴合 `content/posts/` / `content/topics/` 的 Markdown 内容生产。 |
 
 > 说明：旧的 `next-best-practices`（`vercel-labs/next-skills`）已被上游废弃，故不再使用；Next.js 官方 `next-cache-components-*` 面向 server 运行时，与本项目「纯静态导出（`output: 'export'`）」不匹配，未安装。
+>
+> 补充：已评估 `minorcell/minorcell-skills`，仅保留与本项目直接相关的 `web-performance` 与 `writing-blog`。`web-design` 与现有 `web-design-guidelines` 重叠较高，其余写作/视频类技能与博客工程本身关联较弱，暂不引入，以减少无效上下文。
 
 ### 恢复 / 更新技能
 

@@ -7,12 +7,19 @@ interface RecentLogsProps {
 }
 
 export const RecentLogs: React.FC<RecentLogsProps> = ({ posts }) => {
-  // 构造足够长的数据以支撑无限循环跑马灯，且前后两半必须完全相同
-  let base1 = [...posts];
-  while (base1.length < 5) base1 = [...base1, ...posts];
+  if (!posts.length) {
+    return null;
+  }
 
-  let base2 = [...posts].reverse();
-  while (base2.length < 5) base2 = [...base2, ...posts].reverse();
+  const buildMarqueeBase = (items: BlogPost[]) => {
+    const repeatCount = Math.ceil(5 / items.length);
+    return Array.from({ length: repeatCount }, () => items)
+      .flat()
+      .slice(0, Math.max(5, items.length));
+  };
+
+  const base1 = buildMarqueeBase(posts);
+  const base2 = buildMarqueeBase([...posts].reverse());
 
   const finalRow1 = [...base1, ...base1];
   const finalRow2 = [...base2, ...base2];

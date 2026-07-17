@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ArticleView } from '@/components/ArticleView';
 import { loadBlogPosts } from '@/lib/blog-loader';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/structured-data';
-import { BlogPostClient } from './BlogPostClient';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -63,12 +63,12 @@ export default async function BlogPostPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(ld) }}
         />
       ))}
-      <BlogPostClient
+      <ArticleView
         post={post}
+        backLink={{ to: '/blog', label: 'Return to Base' }}
         prevPost={prev ? { id: prev.id, title: prev.title, linkTo: `/blog/${prev.id}` } : undefined}
         nextPost={next ? { id: next.id, title: next.title, linkTo: `/blog/${next.id}` } : undefined}
       />
     </>
   );
 }
-

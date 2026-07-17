@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { ArticleView } from '@/components/ArticleView';
 import { loadTopics } from '@/lib/blog-loader';
-import { TopicPostClient } from './TopicPostClient';
 
 interface Props {
   params: Promise<{ topicSlug: string; postSlug: string }>;
@@ -58,10 +58,9 @@ export default async function TopicPostPage({ params }: Props) {
   const next = postIndex < topic.posts.length - 1 ? topic.posts[postIndex + 1] : undefined;
 
   return (
-    <TopicPostClient
+    <ArticleView
       post={post}
-      topicTitle={topic.meta.title}
-      topicSlug={topicSlug}
+      backLink={{ to: `/topics/${topicSlug}`, label: topic.meta.title }}
       prevPost={prev ? { id: prev.slug, title: prev.title, linkTo: `/topics/${topicSlug}/${prev.slug}` } : undefined}
       nextPost={next ? { id: next.slug, title: next.title, linkTo: `/topics/${topicSlug}/${next.slug}` } : undefined}
     />

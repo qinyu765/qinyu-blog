@@ -1,13 +1,11 @@
-'use client';
-
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import Giscus from '@giscus/react';
 import { estimateReadingTime } from '@/lib/reading-time';
-import { ChevronLeft, ChevronRight, Share2 } from 'lucide-react';
-import { extractHeadings, TocItem } from '@/lib/toc';
-import { TableOfContents } from '@/components/ui/TableOfContents';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { extractHeadings } from '@/lib/toc';
+import { DeferredComments } from '@/components/article/DeferredComments';
+import { InteractiveToc } from '@/components/article/InteractiveToc';
+import { ShareButton } from '@/components/article/ShareButton';
 import { BlogPost } from '@/types';
 
 interface ArticleViewProps {
@@ -17,74 +15,18 @@ interface ArticleViewProps {
   nextPost?: { id: string; title: string; linkTo: string };
 }
 
-export const ArticleView: React.FC<ArticleViewProps> = ({
+export const ArticleView = ({
   post, backLink, prevPost, nextPost,
-}) => {
-  const headings = useMemo<TocItem[]>(
-    () => extractHeadings(post.content),
-    [post.content],
-  );
-
-  const [shareMsg, setShareMsg] = useState('');
-  const [activeId, setActiveId] = useState('');
-  const isScrollingLocked = React.useRef(false);
-
-  useEffect(() => { setActiveId(''); }, [post.id]);
-
-  useEffect(() => {
-    if (!headings.length) { setActiveId(''); return; }
-    let rafId = 0;
-    const computeActive = () => {
-      if (isScrollingLocked.current) return;
-      let current = '';
-      for (const h of headings) {
-        const el = document.getElementById(h.id);
-        if (el && el.getBoundingClientRect().top <= 120) current = h.id;
-      }
-      if (current) setActiveId(current);
-    };
-    const handleScroll = () => {
-      if (rafId) return;
-      rafId = requestAnimationFrame(() => {
-        computeActive();
-        rafId = 0;
-      });
-    };
-    computeActive();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      if (rafId) cancelAnimationFrame(rafId);
-    };
-  }, [headings, post.id]);
-
-  const scrollToHeading = useCallback((headingId: string) => {
-    const el = document.getElementById(headingId);
-    if (!el) return;
-    
-    isScrollingLocked.current = true;
-    setActiveId(headingId);
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
-    // 平滑滚动通常需要一定时间，在此期间锁定自动计算。800ms大约能覆盖常见的滚动动画周期。
-    setTimeout(() => {
-      isScrollingLocked.current = false;
-    }, 800);
-  }, []);
-
-  const handleShare = useCallback(async () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      try { await navigator.share({ title: post.title, url }); } catch {}
-    } else {
-      await navigator.clipboard.writeText(url);
-      setShareMsg('Link copied!');
-      setTimeout(() => setShareMsg(''), 2000);
-    }
-  }, [post.title]);
+}: ArticleViewProps) => {
+  const headings = extractHeadings(post.content);
+  const readingTime = estimateReadingTime(post.content);
 
   return (
     <div className="relative max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden w-full min-w-0">
+      {headings.length > 0 && (
+        <InteractiveToc headings={headings} mode="desktop" />
+      )}
+
       <article>
         <div className="flex justify-between items-center mb-8">
           <Link href={backLink.to} className="group flex items-center space-x-2 text-sm font-bold uppercase tracking-widest text-white/60 hover:text-p3cyan transition-colors">
@@ -93,12 +35,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             </div>
             <span>{backLink.label}</span>
           </Link>
-          <div className="relative">
-            <button onClick={handleShare} className="text-white/60 hover:text-white transition-colors" aria-label="Share this post">
-              <Share2 size={20} />
-            </button>
-            {shareMsg && <span className="absolute -bottom-8 right-0 text-xs text-p3cyan whitespace-nowrap">{shareMsg}</span>}
-          </div>
+          <ShareButton title={post.title} />
         </div>
 
         <header className="mb-8 md:mb-12 relative p-5 md:p-12 border-2 border-white/10 bg-p3dark/50 overflow-hidden">
@@ -112,7 +49,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
             <div className="flex flex-wrap gap-4 text-xs font-mono text-p3cyan mb-6">
               <span className="border border-p3cyan bg-p3cyan/10 px-3 py-1.5">{post.date}</span>
               <span className="bg-p3red text-white px-3 py-1.5 transform -skew-x-12"><span className="inline-block skew-x-12">{post.category}</span></span>
-              <span className="border border-white/20 text-p3mid px-3 py-1.5">{estimateReadingTime(post.content)} MIN READ</span>
+              <span className="border border-white/20 text-p3mid px-3 py-1.5">{readingTime} MIN READ</span>
             </div>
             <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-display font-black uppercase italic leading-tight text-white drop-shadow-lg">
               {post.title}
@@ -121,9 +58,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
         </header>
 
         {headings.length > 0 && (
-          <div className="xl:hidden">
-            <TableOfContents headings={headings} activeId={activeId} onItemClick={scrollToHeading} collapsible />
-          </div>
+          <InteractiveToc headings={headings} mode="mobile" />
         )}
 
         <div className="bg-p3black p-4 sm:p-8 md:p-12 border border-white/5 relative overflow-hidden">
@@ -131,23 +66,7 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           <MarkdownRenderer content={post.content} headings={headings} />
         </div>
 
-        {process.env.NEXT_PUBLIC_GISCUS_REPO_ID && process.env.NEXT_PUBLIC_GISCUS_REPO_ID !== 'your-repo-id' && (
-          <div className="mt-12 border border-white/10 p-6" key={post.id}>
-            <Giscus
-              repo={process.env.NEXT_PUBLIC_GISCUS_REPO as `${string}/${string}`}
-              repoId={process.env.NEXT_PUBLIC_GISCUS_REPO_ID!}
-              category={process.env.NEXT_PUBLIC_GISCUS_CATEGORY}
-              categoryId={process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID!}
-              mapping="specific"
-              term={post.id}
-              reactionsEnabled="1"
-              emitMetadata="0"
-              inputPosition="top"
-              theme="dark_dimmed"
-              lang="zh-CN"
-            />
-          </div>
-        )}
+        <DeferredComments term={post.id} />
 
         <div className="mt-16 pt-8 border-t border-white/10">
           <div className="text-center mb-8">
@@ -176,12 +95,6 @@ export const ArticleView: React.FC<ArticleViewProps> = ({
           </div>
         </div>
       </article>
-
-      {headings.length > 0 && (
-        <aside className="hidden xl:block fixed top-24 left-8 w-64">
-          <TableOfContents headings={headings} activeId={activeId} onItemClick={scrollToHeading} />
-        </aside>
-      )}
     </div>
   );
 };

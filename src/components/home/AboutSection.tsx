@@ -30,7 +30,14 @@ export const AboutSection: React.FC = () => {
         <div className="flex items-center gap-6">
           <div className="bg-gradient-to-b from-p3blue to-p3dark p-1 border-2 border-white transform -skew-x-6 shrink-0 shadow-lg">
             <div className="w-20 h-20 md:w-24 md:h-24 bg-p3dark relative overflow-hidden">
-              <img src="/images/user_admin.webp" alt="Avatar" className="w-full h-full object-cover" loading="lazy" />
+              <img
+                src="/images/user_admin.webp"
+                alt="Avatar"
+                width="200"
+                height="200"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-display font-black italic tracking-wider">STATUS</h1>

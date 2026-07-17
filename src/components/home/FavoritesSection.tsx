@@ -118,7 +118,14 @@ export const FavoritesSection: React.FC<FavoritesSectionProps> = ({ favorites: c
                                 : undefined,
                             }}
                           >
-                            <img src={imgSrc} alt={group.prefix} className="w-full h-full object-cover" loading="lazy" />
+                            <img
+                              src={imgSrc}
+                              alt={group.prefix}
+                              width="256"
+                              height="256"
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                            />
                           </div>
                         );
                       })}

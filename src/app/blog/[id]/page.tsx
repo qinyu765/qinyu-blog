@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ArticleView } from '@/components/ArticleView';
 import { loadBlogPosts } from '@/lib/blog-loader';
 import { articleJsonLd, breadcrumbJsonLd } from '@/lib/structured-data';
+import { blogPostPath } from '@/lib/content/routes';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: post.title,
       description: post.excerpt,
       type: 'article',
-      url: `/blog/${post.id}`,
+      url: blogPostPath(post.id),
     },
   };
 }
@@ -50,7 +51,7 @@ export default async function BlogPostPage({ params }: Props) {
     breadcrumbJsonLd([
       { name: '首页', url: '/' },
       { name: '博客', url: '/blog' },
-      { name: post.title, url: `/blog/${post.id}` },
+      { name: post.title, url: blogPostPath(post.id) },
     ]),
   ];
 
@@ -66,8 +67,8 @@ export default async function BlogPostPage({ params }: Props) {
       <ArticleView
         post={post}
         backLink={{ to: '/blog', label: 'Return to Base' }}
-        prevPost={prev ? { id: prev.id, title: prev.title, linkTo: `/blog/${prev.id}` } : undefined}
-        nextPost={next ? { id: next.id, title: next.title, linkTo: `/blog/${next.id}` } : undefined}
+        prevPost={prev ? { id: prev.id, title: prev.title, linkTo: blogPostPath(prev.id) } : undefined}
+        nextPost={next ? { id: next.id, title: next.title, linkTo: blogPostPath(next.id) } : undefined}
       />
     </>
   );

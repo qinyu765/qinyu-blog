@@ -6,6 +6,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { BlogPost } from '@/types';
+import { blogPostPath } from '@/lib/content/routes';
 
 interface BlogListClientProps {
   posts: BlogPost[];
@@ -109,7 +110,7 @@ export const BlogListClient: React.FC<BlogListClientProps> = ({ posts }) => {
                   </div>
                 )}
                 <Link
-                  href={`/blog/${post.id}`}
+                  href={blogPostPath(post.id)}
                   className="group block relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
                 >
                   <div className="absolute inset-0 bg-p3blue transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out z-0" />

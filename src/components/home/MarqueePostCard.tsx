@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
 import { BlogPost } from "@/types";
+import { blogPostPath } from "@/lib/content/routes";
 
 interface MarqueePostCardProps {
   post: BlogPost;
@@ -10,7 +11,7 @@ interface MarqueePostCardProps {
 export const MarqueePostCard: React.FC<MarqueePostCardProps> = ({ post }) => {
   return (
     <Link
-      href={`/blog/${post.id}`}
+      href={blogPostPath(post.id)}
       className="w-[280px] md:w-[380px] shrink-0 group relative block bg-p3dark/70 border-l-4 border-white hover:border-p3cyan transition-colors overflow-hidden h-full"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-p3blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

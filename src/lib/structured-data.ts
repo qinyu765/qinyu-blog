@@ -1,21 +1,18 @@
-import { BlogPost } from '@/types';
+import { blogPostPath, contentDateToIso } from '@/lib/content';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site';
+import type { BlogPost } from '@/types';
 
-const SITE_URL = 'https://hflin.xyz';
-const SITE_NAME = "HF's Blog";
-
-// 站点级 JSON-LD（WebSite）
 export function websiteJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
     url: SITE_URL,
-    description: '计算机科学技术分享与实践记录',
+    description: SITE_DESCRIPTION,
     inLanguage: 'zh-CN',
   };
 }
 
-// 站长信息（Person）
 export function personJsonLd() {
   return {
     '@context': 'https://schema.org',
@@ -25,15 +22,14 @@ export function personJsonLd() {
   };
 }
 
-// 文章页 JSON-LD（Article）
 export function articleJsonLd(post: BlogPost) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
     description: post.excerpt,
-    datePublished: post.date,
-    url: `${SITE_URL}/blog/${encodeURIComponent(post.id)}`,
+    datePublished: contentDateToIso(post.date),
+    url: absoluteUrl(blogPostPath(post.id)),
     author: {
       '@type': 'Person',
       name: 'HF',
@@ -49,10 +45,7 @@ export function articleJsonLd(post: BlogPost) {
   };
 }
 
-// 面包屑 JSON-LD（BreadcrumbList）
-export function breadcrumbJsonLd(
-  items: { name: string; url: string }[]
-) {
+export function breadcrumbJsonLd(items: { name: string; url: string }[]) {
   return {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -60,7 +53,7 @@ export function breadcrumbJsonLd(
       '@type': 'ListItem',
       position: i + 1,
       name: item.name,
-      item: `${SITE_URL}${item.url}`,
+      item: absoluteUrl(item.url),
     })),
   };
 }

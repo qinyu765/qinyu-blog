@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Topic } from '@/types';
 import { BookOpen } from 'lucide-react';
+import { topicPath } from '@/lib/content/routes';
 
 interface Props {
   topics: Topic[];
@@ -31,7 +32,7 @@ export const TopicListClient: React.FC<Props> = ({ topics }) => (
         {topics.map((topic) => (
           <Link
             key={topic.meta.slug}
-            href={`/topics/${topic.meta.slug}`}
+            href={topicPath(topic.meta.slug)}
             className="group block border-l-4 border-white hover:border-p3cyan bg-white/5 hover:bg-white/[0.08] transition-all duration-300 relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-p3r-crosshatch opacity-10" />

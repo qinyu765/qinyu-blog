@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Topic } from '@/types';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { topicPostPath } from '@/lib/content/routes';
 
 interface Props {
   topic: Topic;
@@ -71,7 +72,7 @@ export const TopicDetailClient: React.FC<Props> = ({ topic }) => {
         {posts.map((post, i) => (
           <Link
             key={post.slug}
-            href={`/topics/${meta.slug}/${post.slug}`}
+            href={topicPostPath(meta.slug, post.slug)}
             className="group flex items-stretch gap-4 bg-white/5 hover:bg-white/[0.08] border border-white/5 hover:border-p3cyan/30 transition-all duration-300"
           >
             <div className="flex-shrink-0 w-16 flex items-center justify-center bg-white/5 group-hover:bg-p3blue/20 transition-colors border-r border-white/5">

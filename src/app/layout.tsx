@@ -1,25 +1,26 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { websiteJsonLd, personJsonLd } from '@/lib/structured-data';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: {
-    default: "HF's Blog",
-    template: "%s | HF's Blog",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: 'HF 的技术博客 — 计算机科学的工程技术分享与实践记录',
+  description: `HF 的技术博客 — ${SITE_DESCRIPTION}`,
   keywords: ['计算机科学', '工程技术', '技术博客', 'JavaScript'],
   openGraph: {
-    title: "HF's Blog",
-    description: '计算机科学的工程技术分享与实践记录',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
     type: 'website',
-    url: 'https://hflin.xyz',
+    url: SITE_URL,
     locale: 'zh_CN',
   },
   twitter: {
     card: 'summary',
   },
-  metadataBase: new URL('https://hflin.xyz'),
+  metadataBase: new URL(SITE_URL),
 };
 
 export default function RootLayout({

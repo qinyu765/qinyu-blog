@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { BlogPost } from "@/types";
+import { blogPostPath } from "@/lib/content/routes";
 
 interface HeroSectionProps {
   latestPost: BlogPost;
@@ -21,7 +22,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ latestPost }) => {
         <div className="relative group">
           <div className="absolute -inset-2 bg-p3cyan/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           <Link
-            href={`/blog/${latestPost.id}`}
+            href={blogPostPath(latestPost.id)}
             className="block relative transform transition-transform duration-300"
           >
             {/* Header Label */}

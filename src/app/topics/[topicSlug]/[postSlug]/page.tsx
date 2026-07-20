@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArticleView } from '@/components/ArticleView';
 import { loadTopics } from '@/lib/blog-loader';
+import { topicPath, topicPostPath } from '@/lib/content/routes';
 
 interface Props {
   params: Promise<{ topicSlug: string; postSlug: string }>;
@@ -60,9 +61,9 @@ export default async function TopicPostPage({ params }: Props) {
   return (
     <ArticleView
       post={post}
-      backLink={{ to: `/topics/${topicSlug}`, label: topic.meta.title }}
-      prevPost={prev ? { id: prev.slug, title: prev.title, linkTo: `/topics/${topicSlug}/${prev.slug}` } : undefined}
-      nextPost={next ? { id: next.slug, title: next.title, linkTo: `/topics/${topicSlug}/${next.slug}` } : undefined}
+      backLink={{ to: topicPath(topicSlug), label: topic.meta.title }}
+      prevPost={prev ? { id: prev.slug, title: prev.title, linkTo: topicPostPath(topicSlug, prev.slug) } : undefined}
+      nextPost={next ? { id: next.slug, title: next.title, linkTo: topicPostPath(topicSlug, next.slug) } : undefined}
     />
   );
 }

@@ -21,15 +21,17 @@
 ```bash
 pnpm install     # 安装依赖
 pnpm dev         # 启动开发服务器（端口 3000）
-pnpm build       # 生产构建 → out/（SSG 静态导出）
+pnpm build       # 生产构建 → out/（SSG 静态导出，并生成 RSS）
+pnpm lint        # ESLint（Next Core Web Vitals + TypeScript）
+pnpm typecheck   # TypeScript 类型检查
+pnpm test        # Node test runner + tsx
+pnpm check       # lint + typecheck + test + build
 pnpm start       # 本地预览生产构建
 
 # 图片优化：将 public/images/ 下的 JPG 转为 WebP（需先 pnpm install）
 node scripts/optimize-images.mjs
 ```
 
-> 未配置测试框架或 linter。
->
 > **注意：** 用户终端通常已在 `http://localhost:3000/` 常驻运行 `pnpm dev`，**不要**自行启动新的 dev server。
 
 ---
@@ -81,7 +83,9 @@ node scripts/optimize-images.mjs
 │   │       └── TableOfContents.tsx
 │   │
 │   ├── lib/                  # 工具库
-│   │   ├── blog-loader.ts    # 博客/专题内容加载器（Node.js fs + gray-matter）
+│   │   ├── content/          # 唯一内容层（schema、加载、路由、RSS、sitemap）
+│   │   ├── blog-loader.ts    # Next 页面兼容包装
+│   │   ├── site.ts           # 站点 URL 与公共元信息
 │   │   ├── favorites.ts      # Favorites 图片扫描（Node.js fs，Server-only）
 │   │   ├── reading-time.ts
 │   │   ├── skills.ts
@@ -160,7 +164,7 @@ Tailwind CSS 4 通过 `postcss.config.mjs` + `@tailwindcss/postcss` 构建。所
 
 ### 独立文章
 
-Markdown 文件存放于 `content/posts/`，构建时由 `src/lib/blog-loader.ts` 通过 Node.js `fs` + `gray-matter` 加载。文件名即 URL slug（`my-post.md` → `/blog/my-post`）。
+Markdown 文件存放于 `content/posts/` 和 `content/topics/`，统一由 `src/lib/content/` 使用 `gray-matter` + Zod 加载和校验。文件名即 URL slug（`my-post.md` → `/blog/my-post`）；无效 frontmatter 会直接阻止测试或构建，而不会被静默跳过。生产构建缓存解析结果，开发环境与 MCP 保持实时读取。
 
 **必需 frontmatter：**
 
@@ -189,7 +193,7 @@ tags: ["tag1", "tag2"]     # 可选
 
 | 类型 | 说明 |
 |------|------|
-| `PostFrontmatter` | 文章 frontmatter 元数据 |
+| `PostFrontmatter` | 文章 frontmatter 元数据（定义于统一内容层） |
 | `BlogPost` | 完整博客文章（含内容） |
 | `TopicMeta` | 专题元信息 |
 | `TopicPost` | 专题下的文章（继承 BlogPost） |

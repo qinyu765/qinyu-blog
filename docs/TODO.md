@@ -11,10 +11,9 @@
 
 ### 高优先级（建议优先处理）
 
-1. **`blog-loader.ts` 重复扫盘 + 重复解析** 🆕
-   - `loadBlogPosts()` / `loadTopics()` 无任何缓存。文章详情路由的 `generateStaticParams`、`generateMetadata`、默认 `Page` 三个函数各调用一次，topics 三级路由同理。SSG 构建时，每篇文章都会触发数十次全量目录扫描与 `gray-matter` 解析。
-   - **改法**：在 `src/lib/blog-loader.ts` 加模块级 `let cache: BlogPost[] | null`，首次加载后复用；dev 模式可按文件 mtime 失效。
-   - 风险低、改动局限于单文件，构建时长立竿见影下降。
+1. **统一内容层与构建缓存** ✅ 2026-07-20
+   - 已将普通文章、专题、路由、RSS 与 sitemap 收敛到 `src/lib/content/`。
+   - 已增加 Zod frontmatter 校验和生产构建缓存；开发环境与 MCP 保持实时读取。
 
 2. **`react-syntax-highlighter` 把整个 PrismJS 打入 bundle** ↘ 见 P3
    - `MarkdownRenderer.tsx` 从 `dist/cjs/styles/prism` 引入 `vscDarkPlus` + Prism 主体，导致**所有语言定义**进入首屏 JS。
@@ -46,7 +45,7 @@
 - `BackgroundEffect` 7 条 ripple + caustics + noise 持续动画，移动端 CPU 偏高；建议移动端裁剪 ripple 数量，或加 `content-visibility: auto`。
 - `FavoritesSection` / `AboutSection` 各自实现 IntersectionObserver，抽出公共 `useInView` hook。
 - `<img>` 多处缺 `width / height`（logo、`user_admin.webp`、favorites 图）会有 CLS。
-- 尚未引入 ESLint / prettier / 测试，`package.json` 的 `lint` 脚本仅是 `next lint` 占位。↘ 见 P2
+- 已引入 ESLint、Node test runner、`typecheck`、`check` 与 PR CI；Prettier 暂不纳入。
 
 ---
 
@@ -74,13 +73,12 @@
   - 抽出重复的排版样式（标题/列表/引用块等）为小组件或常量，降低维护成本
 
 - [x] **Frontmatter 解析升级**
-  - 已从简易正则解析器迁移至 `gray-matter`，支持完整 YAML frontmatter
-  - 待办：schema 校验（zod）和 `draft: true` 过滤
+  - 已使用 `gray-matter` 支持完整 YAML frontmatter
+  - 已增加 Zod schema、确定性日期解析和聚合错误报告；`draft` 能力仍留作后续需求
 
-- [ ] **`blog-loader` 增加模块级缓存** 🆕 2026-06-08
-  - 当前 `loadBlogPosts()` / `loadTopics()` 每次都重读磁盘 + 解析。详情路由的三个函数（`generateStaticParams` / `generateMetadata` / `Page`）会重复调用，构建期成本被放大。
-  - 建议加模块级 `cache` 变量，首次加载后复用；dev 模式可用 mtime 失效。
-  - 涉及文件：`src/lib/blog-loader.ts`
+- [x] **统一内容层并增加生产构建缓存** ✅ 2026-07-20
+  - `src/lib/blog-loader.ts` 保留为兼容包装，解析、校验和缓存集中在 `src/lib/content/`。
+  - 生产构建复用目录解析结果，开发环境和 MCP 不缓存。
 
 - [x] **同步项目文档与实际实现** — 已在 Next.js 迁移后更新 `AGENTS.md`
 
@@ -98,19 +96,19 @@
   - 使用 Next.js App Router 的 `MetadataRoute.Robots` API
 
 - [x] **`app/sitemap.ts` — 动态生成 sitemap.xml** ✅
-  - 遍历所有 posts + topics 路由，替代旧的 `scripts/generate-sitemap.mjs`
+  - 覆盖普通文章、专题入口和专题文章详情页，旧静态 sitemap 与生成脚本已删除
 
 - [x] **RSS / Atom Feed 生成** ✅
-  - `scripts/build-feed.mjs` 构建时生成 `out/feed.xml`（RSS 2.0）
-  - `package.json` postbuild 脚本自动触发
+  - `scripts/build-feed.ts` 复用统一内容层生成 `out/feed.xml`（RSS 2.0）
+  - 专题文章使用详情页 canonical URL，GUID 保证唯一
 
 ---
 
 ## P2 — 工程化
 
-- [ ] **添加 ESLint + Prettier**
-  - 推荐 `@eslint/js` + `typescript-eslint`
-  - 可选 Husky + lint-staged pre-commit
+- [x] **添加 ESLint 质量门禁** ✅ 2026-07-20
+  - 使用 ESLint flat config、Next Core Web Vitals 和 TypeScript 规则
+  - 本轮不引入 Prettier、Husky 或 lint-staged
 
 - [ ] **统一换行符为 LF**
   - 部分文件 CRLF（`LayoutShell.tsx` 等）
@@ -121,9 +119,9 @@
 - [ ] **检查 `tsconfig.json` 严格模式**
   - 确保 `strict: true`、`noUncheckedIndexedAccess`
 
-- [ ] **补充 `typecheck` 脚本并接入 CI**
-  - `package.json` 添加 `typecheck: tsc --noEmit`
-  - GitHub Actions 对 PR / main 做 `pnpm typecheck` + `pnpm build`
+- [x] **补充统一检查脚本并接入 CI** ✅ 2026-07-20
+  - `pnpm check` 依次执行 lint、typecheck、test 和 build
+  - GitHub Actions 对 PR / main 运行质量检查，部署仅在 main 检查通过后执行
 
 - [x] ~~扩展 sitemap / feed 生成~~ — 已拆分至 P1.5 SEO 补全章节
 

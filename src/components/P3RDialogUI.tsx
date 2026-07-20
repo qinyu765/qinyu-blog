@@ -6,8 +6,8 @@ interface P3RDialogUIProps {
 }
 
 export const P3RDialogUI: React.FC<P3RDialogUIProps> = ({ 
-  name, 
-  text
+  name: _name,
+  text: _text
 }) => {
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-none select-none overflow-hidden">

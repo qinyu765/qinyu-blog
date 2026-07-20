@@ -33,7 +33,7 @@ function scanFavorites(): CategoryGroup[] {
       result.push(categoryObj);
     }
 
-    let groupObj = categoryObj.groups.find(g => g.prefix === prefix);
+    const groupObj = categoryObj.groups.find(g => g.prefix === prefix);
     if (groupObj) {
       groupObj.images.push(imgSrc);
     } else {

@@ -63,7 +63,7 @@ export const LayoutChrome = () => {
           <Link href="/" className="hover:text-white transition-colors">
             SYSTEM
           </Link>
-          <span>//</span>
+          <span>{'//'}</span>
           {pathname === '/' ? (
             <span>ROOT</span>
           ) : (

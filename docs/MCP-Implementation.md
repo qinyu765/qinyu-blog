@@ -23,9 +23,9 @@ MCP（Model Context Protocol）是标准化的 AI 工具协议，任何支持 MC
 | Schema 校验 | `zod` v4.3.6 | SDK 要求的 schema 定义方式 |
 | TS 运行时 | `tsx` v4.21.0 | 直接运行 TS，免编译步骤 |
 | 传输协议 | stdio | 最简单，本地子进程通信 |
-| 内容来源 | 直接读 `content/posts/` | 复用现有 Markdown 文件 |
+| 内容来源 | 共享 `src/lib/content/`，MCP 仅选择普通文章 | 与网站、RSS、sitemap 共用解析和校验 |
 
-为什么不复用 `src/lib/blog-loader.ts`？因为它依赖 Next.js 的 `@/` 路径别名和 `process.cwd()` 指向项目根目录的假设。MCP Server 是独立进程，需要自己的内容加载逻辑。
+当前 MCP 已复用 `src/lib/content/` 的解析和 Zod 校验。`mcp-server/content-loader.ts` 只负责通过 `import.meta.url` 定位项目内容目录，并保持 `loadPosts()` / `searchPosts()` 的原有普通文章接口，因此从任意工作目录启动仍然有效。
 
 ---
 

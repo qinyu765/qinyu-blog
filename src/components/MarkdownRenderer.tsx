@@ -1,7 +1,6 @@
 import React, { useMemo, isValidElement, ReactElement } from "react";
 import ReactMarkdown, { ExtraProps } from "react-markdown";
 import remarkGfm from "remark-gfm";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/cjs/styles/prism";
 import { TocItem } from "@/lib/toc";
@@ -42,13 +41,13 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ node, ...props }) => (
+          h1: ({ node: _node, ...props }) => (
             <h1
               className="text-4xl md:text-5xl font-display font-bold italic text-p3cyan mb-6 mt-8 border-b-2 border-white/20 pb-4"
               {...props}
             />
           ),
-          h2: ({ node, children, ...props }) => {
+          h2: ({ node: _node, children, ...props }) => {
             const id = findHeadingId(children);
             return (
               <div className="flex items-center space-x-4 mt-8 mb-4">
@@ -61,7 +60,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               </div>
             );
           },
-          h3: ({ node, children, ...props }) => {
+          h3: ({ node: _node, children, ...props }) => {
             const id = findHeadingId(children);
             return (
               <div className="flex items-center space-x-3 mt-6 mb-3">
@@ -74,26 +73,26 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               </div>
             );
           },
-          p: ({ node, ...props }) => (
+          p: ({ node: _node, ...props }) => (
             <p
               className="text-p3white leading-loose mb-4 text-base"
               {...props}
             />
           ),
-          ul: ({ node, ...props }) => (
+          ul: ({ node: _node, ...props }) => (
             <ul
               className="list-disc list-outside ml-6 mb-6 space-y-2 text-p3white marker:text-p3blue"
               {...props}
             />
           ),
-          li: ({ node, ...props }) => <li className="pl-2" {...props} />,
-          blockquote: ({ node, ...props }) => (
+          li: ({ node: _node, ...props }) => <li className="pl-2" {...props} />,
+          blockquote: ({ node: _node, ...props }) => (
             <blockquote
               className="border-l-4 border-p3blue bg-p3blue/10 p-4 my-6 text-white/90"
               {...props}
             />
           ),
-          a: ({ node, href, children, ...props }) => {
+          a: ({ node: _node, href, children, ...props }) => {
             const isExternal = href?.startsWith("http");
             return (
               <a
@@ -159,7 +158,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             );
           },
           pre: ({ children }: React.ComponentPropsWithoutRef<'pre'> & ExtraProps) => <>{children}</>,
-          table: ({ node, ...props }) => (
+          table: ({ node: _node, ...props }) => (
             <div className="overflow-x-auto my-6">
               <table
                 className="w-full border-collapse border border-white/20 text-sm"
@@ -167,16 +166,16 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               />
             </div>
           ),
-          thead: ({ node, ...props }) => (
+          thead: ({ node: _node, ...props }) => (
             <thead className="bg-p3blue/30" {...props} />
           ),
-          th: ({ node, ...props }) => (
+          th: ({ node: _node, ...props }) => (
             <th
               className="border border-white/20 px-4 py-2 text-left text-white font-bold uppercase tracking-wider"
               {...props}
             />
           ),
-          td: ({ node, ...props }) => (
+          td: ({ node: _node, ...props }) => (
             <td
               className="border border-white/20 px-4 py-2 text-p3white"
               {...props}

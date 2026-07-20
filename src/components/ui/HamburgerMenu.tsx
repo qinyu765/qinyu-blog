@@ -62,7 +62,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               <Link
                 key={item.path}
                 href={item.path}
-                onClick={(e) => {
+                onClick={() => {
                   onToggle();
                   const [pathPart, hashPart] = item.path.split('#');
                   const path = pathPart || '/';

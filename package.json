@@ -7,10 +7,13 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "node scripts/build-feed.mjs",
+    "postbuild": "tsx scripts/build-feed.ts",
     "start": "next start",
-    "lint": "next lint",
-    "mcp": "tsx mcp-server/index.ts"
+    "lint": "eslint .",
+    "mcp": "tsx mcp-server/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
@@ -27,11 +30,14 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^22.14.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "15.5.12",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2"

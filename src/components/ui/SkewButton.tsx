@@ -16,7 +16,7 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ href, children, isActive
   const [targetPath] = href.split('?');
   const active = isActive !== undefined ? isActive : pathname === targetPath;
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = () => {
     const [pathPart, hashPart] = href.split('#');
     const path = pathPart || '/';
 

@@ -6,7 +6,7 @@
  * 用法: node scripts/optimize-images.mjs
  */
 import sharp from 'sharp';
-import { readdir, stat, mkdir, unlink } from 'fs/promises';
+import { readdir, stat, unlink } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 

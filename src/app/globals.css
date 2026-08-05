@@ -16,8 +16,8 @@
   --animate-float: float 6s ease-in-out infinite;
   --animate-pulse-fast: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-slide-in-right: slideInRight 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-  --animate-marquee: marquee 40s linear infinite;
-  --animate-marquee-reverse: marqueeReverse 40s linear infinite;
+  --animate-marquee: marquee 72s linear infinite;
+  --animate-marquee-reverse: marqueeReverse 72s linear infinite;
 }
 
 @keyframes float {

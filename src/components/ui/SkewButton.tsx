@@ -59,7 +59,7 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ href, children, isActive
       <div className="relative px-6 py-2">
         <span
           className={`
-            font-display text-base tracking-wider transform skew-x-12 block
+            font-display text-base tracking-wider block
             transition-colors duration-300
             ${textClass}
           `}

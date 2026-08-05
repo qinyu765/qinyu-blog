@@ -36,14 +36,14 @@ export const RecentLogs: React.FC<RecentLogsProps> = ({ posts }) => {
 
       <div className="-mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden flex flex-col gap-6 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-16 md:before:w-32 before:bg-gradient-to-r before:from-p3dark before:to-transparent before:z-20 before:pointer-events-none after:absolute after:right-0 after:top-0 after:bottom-0 after:w-16 md:after:w-32 after:bg-gradient-to-l after:from-p3dark after:to-transparent after:z-20 after:pointer-events-none">
         {/* Row 1 - Marquee Left */}
-        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] gap-6 px-4 will-change-transform">
+        <div className="flex w-max animate-marquee hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] gap-6 px-4 will-change-transform">
           {finalRow1.map((post, index) => (
             <MarqueePostCard key={`row1-${post.id}-${index}`} post={post} />
           ))}
         </div>
 
         {/* Row 2 - Marquee Right */}
-        <div className="flex w-max animate-marquee-reverse hover:[animation-play-state:paused] gap-6 px-4 will-change-transform">
+        <div className="flex w-max animate-marquee-reverse hover:[animation-play-state:paused] focus-within:[animation-play-state:paused] gap-6 px-4 will-change-transform">
           {finalRow2.map((post, index) => (
             <MarqueePostCard key={`row2-${post.id}-${index}`} post={post} />
           ))}

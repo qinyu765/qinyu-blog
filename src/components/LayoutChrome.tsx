@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { SkewButton } from '@/components/ui/SkewButton';
@@ -51,11 +52,11 @@ export const LayoutChrome = () => {
       >
         <div className="hidden md:flex flex-1 min-w-0 items-center space-x-2 text-sm font-mono text-p3cyan tracking-wider">
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <img
+            <Image
               src="/logo.svg"
               alt="Logo"
-              width="512"
-              height="512"
+              width={512}
+              height={512}
               className="h-10 w-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
             />
           </Link>
@@ -105,11 +106,11 @@ export const LayoutChrome = () => {
 
         <div className="md:hidden flex items-center">
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
-            <img
+            <Image
               src="/logo.svg"
               alt="Logo"
-              width="512"
-              height="512"
+              width={512}
+              height={512}
               className="h-8 w-8 drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]"
             />
           </Link>

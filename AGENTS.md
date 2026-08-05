@@ -14,6 +14,12 @@
 
 **部署：** GitHub Pages，通过 GitHub Actions 自动部署（`.github/workflows/deploy.yml`），推送 `main` 分支即触发。
 
+### Git 工作流约束
+
+- 本项目不采用分支协作流程，直接在 `main` 分支进行开发。
+- 不创建或切换到功能分支；开发、验证和提交均直接在 `main` 上完成。
+- 以上规则是本项目对通用 feature branch / Pull Request 协作流程的明确例外。
+
 ---
 
 ## 开发命令

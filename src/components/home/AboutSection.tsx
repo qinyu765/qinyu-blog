@@ -1,5 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
+import { Github } from "lucide-react";
 import { SKILLS } from "@/lib/skills";
+import { GITHUB_URL } from "@/lib/site";
 
 export const AboutSection: React.FC = () => {
   const aboutRef = useRef<HTMLDivElement>(null);
@@ -30,11 +33,11 @@ export const AboutSection: React.FC = () => {
         <div className="flex items-center gap-6">
           <div className="bg-gradient-to-b from-p3blue to-p3dark p-1 border-2 border-white transform -skew-x-6 shrink-0 shadow-lg">
             <div className="w-20 h-20 md:w-24 md:h-24 bg-p3dark relative overflow-hidden">
-              <img
+              <Image
                 src="/images/user_admin.webp"
                 alt="Avatar"
-                width="200"
-                height="200"
+                width={200}
+                height={200}
                 className="w-full h-full object-cover"
                 loading="lazy"
               />
@@ -51,6 +54,16 @@ export const AboutSection: React.FC = () => {
               始终保持对前沿新技术的好奇心与探索欲。
             </p>
           </div>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="访问 HF 的 GitHub 主页"
+            className="mt-6 inline-flex items-center gap-2 border-2 border-white/20 bg-p3dark/70 px-4 py-2 text-p3cyan transition-all duration-200 hover:-translate-y-[2px] hover:border-p3cyan hover:bg-p3blue/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+          >
+            <Github size={17} aria-hidden="true" />
+            <span className="font-display text-sm tracking-wider">GITHUB / @qinyu765</span>
+          </a>
         </div>
 
         {/* Skill Matrix */}

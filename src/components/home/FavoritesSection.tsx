@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import { CategoryGroup } from "@/lib/favorites";
 
 interface FavoritesSectionProps {
@@ -118,11 +119,11 @@ export const FavoritesSection: React.FC<FavoritesSectionProps> = ({ favorites: c
                                 : undefined,
                             }}
                           >
-                            <img
+                            <Image
                               src={imgSrc}
                               alt={group.prefix}
-                              width="256"
-                              height="256"
+                              fill
+                              sizes="(max-width: 767px) 224px, 256px"
                               className="w-full h-full object-cover"
                               loading="lazy"
                             />

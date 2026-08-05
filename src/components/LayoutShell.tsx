@@ -28,10 +28,10 @@ export const LayoutShell = ({ children }: LayoutShellProps) => {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="访问 HF 的 GitHub 主页"
-            className="inline-flex items-center gap-2 self-start border-2 border-white/20 bg-p3dark/70 px-4 py-2 text-p3cyan transition-all duration-200 hover:-translate-y-[2px] hover:border-p3cyan hover:bg-p3blue/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark sm:self-auto"
+            className="inline-flex items-center gap-2 self-start text-p3cyan transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark sm:self-auto"
           >
-            <Github size={17} aria-hidden="true" />
-            <span className="font-display text-sm tracking-wider">GITHUB / @qinyu765</span>
+            <Github size={18} aria-hidden="true" />
+            <span className="font-display text-sm tracking-wider">GITHUB</span>
           </a>
         </div>
       </footer>

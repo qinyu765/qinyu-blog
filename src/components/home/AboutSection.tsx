@@ -30,7 +30,7 @@ export const AboutSection: React.FC = () => {
         }`}
       >
         {/* Avatar + Title */}
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-6">
           <div className="bg-gradient-to-b from-p3blue to-p3dark p-1 border-2 border-white transform -skew-x-6 shrink-0 shadow-lg">
             <div className="w-20 h-20 md:w-24 md:h-24 bg-p3dark relative overflow-hidden">
               <Image
@@ -43,7 +43,19 @@ export const AboutSection: React.FC = () => {
               />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-display font-black italic tracking-wider">STATUS</h1>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <h1 className="text-4xl md:text-5xl font-display font-black italic tracking-wider">STATUS</h1>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="访问 HF 的 GitHub 主页"
+              className="inline-flex items-center gap-2 text-p3cyan transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+            >
+              <Github size={18} aria-hidden="true" />
+              <span className="font-display text-sm tracking-wider">GITHUB</span>
+            </a>
+          </div>
         </div>
 
         {/* Intro */}
@@ -54,16 +66,6 @@ export const AboutSection: React.FC = () => {
               始终保持对前沿新技术的好奇心与探索欲。
             </p>
           </div>
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="访问 HF 的 GitHub 主页"
-            className="mt-6 inline-flex items-center gap-2 border-2 border-white/20 bg-p3dark/70 px-4 py-2 text-p3cyan transition-all duration-200 hover:-translate-y-[2px] hover:border-p3cyan hover:bg-p3blue/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
-          >
-            <Github size={17} aria-hidden="true" />
-            <span className="font-display text-sm tracking-wider">GITHUB / @qinyu765</span>
-          </a>
         </div>
 
         {/* Skill Matrix */}

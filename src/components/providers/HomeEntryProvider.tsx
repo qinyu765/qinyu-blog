@@ -9,8 +9,10 @@ import {
 } from 'react';
 import {
   reduceHomeEntryIntent,
-  reduceHomeIntroKey,
+  reduceHomeIntroRequest,
   type HomeEntryContextValue,
+  type HomeIntroMode,
+  type HomeIntroRequest,
   type HomeSection,
 } from '@/lib/home-entry';
 
@@ -18,7 +20,14 @@ const HomeEntryContext = createContext<HomeEntryContextValue | null>(null);
 
 export function HomeEntryProvider({ children }: { children: React.ReactNode }) {
   const [pendingHomeSection, dispatch] = useReducer(reduceHomeEntryIntent, null);
-  const [homeIntroKey, replayHomeIntro] = useReducer(reduceHomeIntroKey, 0);
+  const [homeIntroRequest, requestHomeIntro] = useReducer(
+    (state: HomeIntroRequest, mode: HomeIntroMode) => reduceHomeIntroRequest(state, mode),
+    { key: 0, mode: 'fresh' },
+  );
+  const [consumedHomeIntroKey, setConsumedHomeIntroKey] = useReducer(
+    (state: number, key: number) => Math.max(state, key),
+    0,
+  );
 
   const prepareHomeSection = useCallback((section: HomeSection) => {
     dispatch({ type: 'prepare-section', section });
@@ -28,13 +37,26 @@ export function HomeEntryProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'clear-section' });
   }, []);
 
+  const consumeHomeIntro = useCallback((key: number) => {
+    setConsumedHomeIntroKey(key);
+  }, []);
+
   const value = useMemo<HomeEntryContextValue>(() => ({
     pendingHomeSection,
-    homeIntroKey,
+    homeIntroRequest,
+    consumedHomeIntroKey,
     prepareHomeSection,
     clearHomeSection,
-    replayHomeIntro,
-  }), [clearHomeSection, homeIntroKey, pendingHomeSection, prepareHomeSection]);
+    requestHomeIntro,
+    consumeHomeIntro,
+  }), [
+    clearHomeSection,
+    consumeHomeIntro,
+    consumedHomeIntroKey,
+    homeIntroRequest,
+    pendingHomeSection,
+    prepareHomeSection,
+  ]);
 
   return (
     <HomeEntryContext.Provider value={value}>

@@ -2,14 +2,23 @@ import { shouldAnimateOrb } from './orb-motion';
 
 export type HomeSection = 'about' | 'favorites';
 
-export type OrbEntryMode = 'intro' | 'anchor' | 'resting';
+export type HomeIntroMode = 'fresh' | 'returning';
+
+export interface HomeIntroRequest {
+  key: number;
+  mode: HomeIntroMode;
+}
+
+export type OrbEntryMode = 'intro' | 'returning' | 'anchor' | 'resting';
 
 export interface HomeEntryContextValue {
   pendingHomeSection: HomeSection | null;
-  homeIntroKey: number;
+  homeIntroRequest: HomeIntroRequest;
+  consumedHomeIntroKey: number;
   prepareHomeSection(section: HomeSection): void;
   clearHomeSection(): void;
-  replayHomeIntro(): void;
+  requestHomeIntro(mode: HomeIntroMode): void;
+  consumeHomeIntro(key: number): void;
 }
 
 export interface OrbEntryContext {
@@ -18,6 +27,8 @@ export interface OrbEntryContext {
   hash: string;
   viewportWidth: number;
   reducedMotion: boolean;
+  homeIntroRequest: HomeIntroRequest;
+  consumedHomeIntroKey: number;
 }
 
 export type HomeEntryAction =
@@ -38,7 +49,7 @@ interface HomeNavigationContext {
   activation: NavigationActivation;
 }
 
-export type HomeNavigationIntent = HomeSection | 'intro' | null;
+export type HomeNavigationIntent = HomeSection | HomeIntroMode | null;
 
 export function isPlainNavigationActivation(
   activation: NavigationActivation,
@@ -61,8 +72,14 @@ export function reduceHomeEntryIntent(
   return null;
 }
 
-export function reduceHomeIntroKey(state: number): number {
-  return state + 1;
+export function reduceHomeIntroRequest(
+  state: HomeIntroRequest,
+  mode: HomeIntroMode,
+): HomeIntroRequest {
+  return {
+    key: state.key + 1,
+    mode,
+  };
 }
 
 export function getHomeSectionFromHash(hash: string): HomeSection | null {
@@ -80,7 +97,7 @@ export function getHomeNavigationIntent({
   }
 
   if (href === '/') {
-    return 'intro';
+    return pathname === '/' ? 'fresh' : 'returning';
   }
 
   if (pathname === '/') {
@@ -98,6 +115,8 @@ export function resolveOrbEntryMode(_context: OrbEntryContext): OrbEntryMode {
     hash,
     viewportWidth,
     reducedMotion,
+    homeIntroRequest,
+    consumedHomeIntroKey,
   } = _context;
 
   if (!shouldAnimateOrb({ pathname, viewportWidth, reducedMotion })) {
@@ -109,6 +128,13 @@ export function resolveOrbEntryMode(_context: OrbEntryContext): OrbEntryMode {
     || getHomeSectionFromHash(hash) !== null
   ) {
     return 'anchor';
+  }
+
+  if (
+    homeIntroRequest.mode === 'returning'
+    && homeIntroRequest.key > consumedHomeIntroKey
+  ) {
+    return 'returning';
   }
 
   return 'intro';

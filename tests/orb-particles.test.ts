@@ -44,5 +44,23 @@ test('粒子在开始时保持字形，结束时局部漂散并透明', () => {
 
   const end = particleStateAt(particle, 1);
   assert.equal(end.opacity, 0);
-  assert.ok(Math.hypot(end.x - 10, end.y - 20) <= 28);
+  assert.ok(Math.hypot(end.x - 10, end.y - 20) <= 20);
+});
+
+test('粒子在滚动 10% 前保持完整，并在 82% 时全部消散', () => {
+  const particle = createWordParticles([{ x: 10, y: 20 }], 0x4c494e)[0];
+
+  assert.equal(particleStateAt(particle, 0.1).opacity, 1);
+  assert.equal(particleStateAt(particle, 0.82).opacity, 0);
+});
+
+test('粒子延迟和漂移范围收紧到贴近月面的范围', () => {
+  const particles = createWordParticles(
+    Array.from({ length: 64 }, (_, index) => ({ x: index, y: index })),
+    0x4c494e,
+  );
+
+  assert.ok(particles.every((particle) => particle.delay <= 0.12));
+  assert.ok(particles.every((particle) => Math.hypot(particle.driftX, particle.driftY) >= 6));
+  assert.ok(particles.every((particle) => Math.hypot(particle.driftX, particle.driftY) <= 20));
 });

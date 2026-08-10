@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { OrbLayers } from '@/components/ui/OrbLayers';
 import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
@@ -14,10 +14,13 @@ import {
   getOrbMotionGeometry,
   getOrbMotionState,
   getOrbScrollProgress,
+  type OrbMotionGeometry,
 } from '@/lib/orb-motion';
-import { resolveOrbEntryMode } from '@/lib/home-entry';
+import { resolveOrbEntryMode, type OrbEntryMode } from '@/lib/home-entry';
 
 const PARTICLE_SEED = 0x4c494e;
+const RETURN_DURATION = 1.1;
+const RETURN_HANDOFF_DURATION = 0.16;
 
 interface ParticleRenderer {
   draw: (progress: number) => void;
@@ -85,11 +88,44 @@ function clearCanvas(canvas: HTMLCanvasElement) {
   canvas.height = 1;
 }
 
+function applyTargetState(
+  motionElement: HTMLDivElement,
+  geometry: OrbMotionGeometry,
+) {
+  Object.assign(motionElement.style, {
+    left: '0px',
+    top: '0px',
+    width: `${geometry.targetSize}px`,
+    height: `${geometry.targetSize}px`,
+    transform: `translate3d(${geometry.targetLeft}px, ${geometry.targetTop}px, 0) scale(1)`,
+    transformOrigin: 'top left',
+  });
+}
+
 export const OrbScene: React.FC = () => {
   const pathname = usePathname();
-  const { pendingHomeSection, homeIntroKey } = useHomeEntry();
+  const {
+    pendingHomeSection,
+    homeIntroRequest,
+    consumedHomeIntroKey,
+    consumeHomeIntro,
+  } = useHomeEntry();
   const motionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const isReturningRequest = pathname === '/'
+    && pendingHomeSection === null
+    && homeIntroRequest.mode === 'returning'
+    && homeIntroRequest.key > consumedHomeIntroKey;
+
+  useLayoutEffect(() => {
+    const motionElement = motionRef.current;
+    if (!motionElement || !isReturningRequest) return;
+
+    applyTargetState(
+      motionElement,
+      getOrbMotionGeometry(window.innerWidth, window.innerHeight),
+    );
+  }, [homeIntroRequest.key, isReturningRequest]);
 
   useEffect(() => {
     const motionElement = motionRef.current;
@@ -102,6 +138,9 @@ export const OrbScene: React.FC = () => {
     let resizeFrame = 0;
     let resizeTimer = 0;
     let disposeAnimation = () => {};
+    let returnActive = false;
+    let returnCompleted = false;
+    let handleReturnResize = () => {};
 
     const applyRestingState = () => {
       const geometry = getOrbMotionGeometry(window.innerWidth, window.innerHeight);
@@ -113,6 +152,7 @@ export const OrbScene: React.FC = () => {
         transform: `translate3d(${geometry.targetLeft}px, ${geometry.targetTop}px, 0) scale(1)`,
         transformOrigin: 'top left',
       });
+      canvas.style.opacity = '1';
       clearCanvas(canvas);
     };
 
@@ -120,22 +160,35 @@ export const OrbScene: React.FC = () => {
       setupVersion += 1;
       const currentVersion = setupVersion;
 
-      const entryMode = resolveOrbEntryMode({
+      const resolvedEntryMode = resolveOrbEntryMode({
         pathname,
         pendingHomeSection,
         hash: window.location.hash,
         viewportWidth: window.innerWidth,
         reducedMotion: reducedMotionQuery.matches,
+        homeIntroRequest,
+        consumedHomeIntroKey,
       });
-      if (entryMode !== 'intro') {
+      const entryMode: OrbEntryMode = resolvedEntryMode === 'returning' && returnCompleted
+        ? 'intro'
+        : resolvedEntryMode;
+
+      const hasPendingReturningRequest = pathname === '/'
+        && pendingHomeSection === null
+        && homeIntroRequest.mode === 'returning'
+        && homeIntroRequest.key > consumedHomeIntroKey;
+      if (hasPendingReturningRequest && resolvedEntryMode === 'resting') {
+        consumeHomeIntro(homeIntroRequest.key);
+      }
+
+      if (entryMode !== 'intro' && entryMode !== 'returning') {
         disposeAnimation();
         disposeAnimation = () => {};
         applyRestingState();
         return;
       }
 
-      const geometry = getOrbMotionGeometry(window.innerWidth, window.innerHeight);
-      let disposeReplacement = () => {};
+      const initialGeometry = getOrbMotionGeometry(window.innerWidth, window.innerHeight);
 
       try {
         const [, { gsap }, { ScrollTrigger }] = await Promise.all([
@@ -145,78 +198,226 @@ export const OrbScene: React.FC = () => {
         ]);
         if (currentVersion !== setupVersion) return;
 
-        const scrollProgress = getOrbScrollProgress(
-          window.scrollY,
-          window.innerHeight,
-        );
-        const motionState = getOrbMotionState(geometry, scrollProgress);
-
-        // 新依赖与几何都准备好后再同步替换，避免 resize 时闪回起点。
         disposeAnimation();
         disposeAnimation = () => {};
 
-        const renderer = createParticleRenderer(canvas, geometry.targetSize);
+        const renderer = createParticleRenderer(canvas, initialGeometry.targetSize);
         if (!renderer) {
           applyRestingState();
           return;
         }
-        disposeReplacement = renderer.clear;
 
         gsap.registerPlugin(ScrollTrigger);
-        gsap.set(motionElement, {
-          left: 0,
-          top: 0,
-          width: geometry.targetSize,
-          height: geometry.targetSize,
-          transformOrigin: 'top left',
-          xPercent: 0,
-          yPercent: 0,
-          x: motionState.x,
-          y: motionState.y,
-          scale: motionState.scale,
-        });
-        renderer.draw(scrollProgress);
+        let activeGeometry = initialGeometry;
+        let returnTween: { kill: () => void; progress: () => number } | null = null;
+        let handoffTween: { kill: () => void } | null = null;
+        let scrollTimeline: { kill: () => void; scrollTrigger?: { kill: () => void } } | null = null;
+        let returnScrollListener: (() => void) | null = null;
+        let returnDeadline = 0;
 
-        const timeline = gsap.timeline({
-          scrollTrigger: {
-            start: 0,
-            end: () => window.innerHeight,
-            scrub: 0.35,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => renderer.draw(self.progress),
-          },
-        });
+        const createScrollTimeline = (initialProgress: number) => {
+          scrollTimeline?.scrollTrigger?.kill();
+          scrollTimeline?.kill();
 
-        timeline.fromTo(
-          motionElement,
-          {
-            x: geometry.startLeft,
-            y: geometry.startTop,
-            scale: geometry.startScale,
-          },
-          {
-            x: geometry.targetLeft,
-            y: geometry.targetTop,
-            scale: 1,
-            duration: 1,
-            ease: 'none',
-            immediateRender: false,
-          },
-        );
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              start: 0,
+              end: () => window.innerHeight,
+              scrub: 0.35,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => renderer.draw(self.progress),
+            },
+          });
 
-        timeline.progress(scrollProgress);
-        ScrollTrigger.refresh();
-        renderer.draw(timeline.scrollTrigger?.progress ?? scrollProgress);
+          timeline.fromTo(
+            motionElement,
+            {
+              x: activeGeometry.startLeft,
+              y: activeGeometry.startTop,
+              scale: activeGeometry.startScale,
+            },
+            {
+              x: activeGeometry.targetLeft,
+              y: activeGeometry.targetTop,
+              scale: 1,
+              duration: 1,
+              ease: 'none',
+              immediateRender: false,
+            },
+          );
+          timeline.progress(initialProgress);
+          scrollTimeline = timeline;
+          ScrollTrigger.refresh();
+          renderer.draw(timeline.scrollTrigger?.progress ?? initialProgress);
+          return timeline;
+        };
 
-        disposeReplacement = () => {
-          timeline.scrollTrigger?.kill();
-          timeline.kill();
+        const stopReturnListener = () => {
+          if (returnScrollListener) {
+            window.removeEventListener('scroll', returnScrollListener);
+            returnScrollListener = null;
+          }
+        };
+
+        const completeReturn = () => {
+          if (!returnActive) return;
+          returnActive = false;
+          returnCompleted = true;
+          handleReturnResize = () => {};
+          stopReturnListener();
+          returnTween = null;
+          gsap.killTweensOf(canvas);
+          gsap.set(canvas, { opacity: 1 });
+          createScrollTimeline(getOrbScrollProgress(window.scrollY, window.innerHeight));
+          consumeHomeIntro(homeIntroRequest.key);
+        };
+
+        const handoffToScroll = () => {
+          if (!returnActive) return;
+          returnActive = false;
+          returnCompleted = true;
+          handleReturnResize = () => {};
+          stopReturnListener();
+          returnTween?.kill();
+          returnTween = null;
+
+          const progress = getOrbScrollProgress(window.scrollY, window.innerHeight);
+          const state = getOrbMotionState(activeGeometry, progress);
+          const currentOpacity = Number(gsap.getProperty(canvas, 'opacity')) || 0;
+          renderer.draw(progress);
+          gsap.killTweensOf(canvas);
+
+          handoffTween = gsap.to(motionElement, {
+            x: state.x,
+            y: state.y,
+            scale: state.scale,
+            duration: RETURN_HANDOFF_DURATION,
+            ease: 'power2.out',
+            onComplete: () => {
+              handoffTween = null;
+              const latestProgress = getOrbScrollProgress(window.scrollY, window.innerHeight);
+              renderer.draw(latestProgress);
+              gsap.to(canvas, {
+                opacity: 1,
+                duration: RETURN_HANDOFF_DURATION,
+                ease: 'power2.out',
+              });
+              createScrollTimeline(latestProgress);
+              consumeHomeIntro(homeIntroRequest.key);
+            },
+          });
+          gsap.fromTo(canvas, { opacity: currentOpacity }, {
+            opacity: 1,
+            duration: RETURN_HANDOFF_DURATION,
+            ease: 'power2.out',
+          });
+        };
+
+        if (entryMode === 'returning') {
+          returnActive = true;
+          applyTargetState(motionElement, activeGeometry);
+          renderer.draw(0);
+          gsap.set(canvas, { opacity: 0 });
+
+          returnScrollListener = handoffToScroll;
+          window.addEventListener('scroll', returnScrollListener, { passive: true });
+
+          returnTween = gsap.fromTo(
+            motionElement,
+            {
+              x: activeGeometry.targetLeft,
+              y: activeGeometry.targetTop,
+              scale: 1,
+            },
+            {
+              x: activeGeometry.startLeft,
+              y: activeGeometry.startTop,
+              scale: activeGeometry.startScale,
+              duration: RETURN_DURATION,
+              ease: 'power3.out',
+              onComplete: completeReturn,
+            },
+          );
+          returnDeadline = performance.now() + RETURN_DURATION * 1000;
+          gsap.to(canvas, {
+            opacity: 1,
+            delay: RETURN_DURATION * 0.2,
+            duration: RETURN_DURATION * 0.8,
+            ease: 'power2.out',
+          });
+
+          handleReturnResize = () => {
+            if (!returnActive || !returnTween) return;
+            const currentX = Number(gsap.getProperty(motionElement, 'x'));
+            const currentY = Number(gsap.getProperty(motionElement, 'y'));
+            const currentScale = Number(gsap.getProperty(motionElement, 'scale'));
+            const visualSize = activeGeometry.targetSize * currentScale;
+            const nextGeometry = getOrbMotionGeometry(window.innerWidth, window.innerHeight);
+            activeGeometry = nextGeometry;
+            returnTween.kill();
+            gsap.killTweensOf(canvas);
+            gsap.set(motionElement, {
+              width: nextGeometry.targetSize,
+              height: nextGeometry.targetSize,
+              x: currentX,
+              y: currentY,
+              scale: visualSize / nextGeometry.targetSize,
+            });
+            const remainingDuration = Math.max(0, (returnDeadline - performance.now()) / 1000);
+            if (remainingDuration <= 0.02) {
+              gsap.set(motionElement, {
+                x: nextGeometry.startLeft,
+                y: nextGeometry.startTop,
+                scale: nextGeometry.startScale,
+              });
+              completeReturn();
+              return;
+            }
+            returnTween = gsap.to(motionElement, {
+              x: nextGeometry.startLeft,
+              y: nextGeometry.startTop,
+              scale: nextGeometry.startScale,
+              duration: remainingDuration,
+              ease: 'power3.out',
+              onComplete: completeReturn,
+            });
+            gsap.to(canvas, {
+              opacity: 1,
+              duration: Math.min(remainingDuration, RETURN_DURATION * 0.8),
+              ease: 'power2.out',
+            });
+          };
+        } else {
+          const scrollProgress = getOrbScrollProgress(window.scrollY, window.innerHeight);
+          const motionState = getOrbMotionState(activeGeometry, scrollProgress);
+          gsap.set(motionElement, {
+            left: 0,
+            top: 0,
+            width: activeGeometry.targetSize,
+            height: activeGeometry.targetSize,
+            transformOrigin: 'top left',
+            xPercent: 0,
+            yPercent: 0,
+            x: motionState.x,
+            y: motionState.y,
+            scale: motionState.scale,
+          });
+          gsap.set(canvas, { opacity: 1 });
+          renderer.draw(scrollProgress);
+          createScrollTimeline(scrollProgress);
+        }
+
+        disposeAnimation = () => {
+          stopReturnListener();
+          handleReturnResize = () => {};
+          returnTween?.kill();
+          handoffTween?.kill();
+          scrollTimeline?.scrollTrigger?.kill();
+          scrollTimeline?.kill();
+          gsap.killTweensOf(canvas);
           renderer.clear();
         };
-        disposeAnimation = disposeReplacement;
-        disposeReplacement = () => {};
       } catch {
-        disposeReplacement();
         if (currentVersion !== setupVersion) return;
         disposeAnimation();
         disposeAnimation = () => {};
@@ -225,6 +426,11 @@ export const OrbScene: React.FC = () => {
     };
 
     const scheduleInitialize = () => {
+      if (returnActive) {
+        handleReturnResize();
+        return;
+      }
+
       setupVersion += 1;
       window.cancelAnimationFrame(resizeFrame);
       window.clearTimeout(resizeTimer);
@@ -235,8 +441,18 @@ export const OrbScene: React.FC = () => {
       });
     };
 
-    desktopQuery.addEventListener('change', scheduleInitialize);
-    reducedMotionQuery.addEventListener('change', scheduleInitialize);
+    const handleMotionPreferenceChange = () => {
+      returnActive = false;
+      returnCompleted = true;
+      if (pathname === '/' && homeIntroRequest.mode === 'returning') {
+        consumeHomeIntro(homeIntroRequest.key);
+      }
+      disposeAnimation();
+      scheduleInitialize();
+    };
+
+    desktopQuery.addEventListener('change', handleMotionPreferenceChange);
+    reducedMotionQuery.addEventListener('change', handleMotionPreferenceChange);
     window.addEventListener('resize', scheduleInitialize, { passive: true });
     void initialize();
 
@@ -244,17 +460,28 @@ export const OrbScene: React.FC = () => {
       setupVersion += 1;
       window.cancelAnimationFrame(resizeFrame);
       window.clearTimeout(resizeTimer);
-      desktopQuery.removeEventListener('change', scheduleInitialize);
-      reducedMotionQuery.removeEventListener('change', scheduleInitialize);
+      desktopQuery.removeEventListener('change', handleMotionPreferenceChange);
+      reducedMotionQuery.removeEventListener('change', handleMotionPreferenceChange);
       window.removeEventListener('resize', scheduleInitialize);
       disposeAnimation();
     };
-  }, [homeIntroKey, pathname, pendingHomeSection]);
+  }, [
+    consumedHomeIntroKey,
+    consumeHomeIntro,
+    homeIntroRequest,
+    pathname,
+    pendingHomeSection,
+  ]);
+
+  const isHomeIntro = pathname === '/'
+    && pendingHomeSection === null
+    && !isReturningRequest;
 
   return (
     <div
       ref={motionRef}
-      data-home-intro={pathname === '/' && pendingHomeSection === null ? 'true' : 'false'}
+      data-home-intro={isHomeIntro ? 'true' : 'false'}
+      data-home-returning={isReturningRequest ? 'true' : 'false'}
       className="p3r-orb-motion pointer-events-none"
       aria-hidden="true"
     >

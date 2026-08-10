@@ -9,28 +9,30 @@ interface HeroSectionProps {
 
 export const HeroSection: React.FC<HeroSectionProps> = ({ latestPost }) => {
   return (
-    <section className="relative w-full min-h-[50vh] flex items-center">
-      <div className="w-full grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 xl:gap-16 items-center">
+    <section
+      data-home-orb-trigger="true"
+      className="relative flex min-h-[60vh] w-full items-center lg:min-h-[calc(100svh-5rem)]"
+    >
+      <div className="grid w-full grid-cols-1 items-center gap-8 lg:block lg:min-h-[calc(100svh-5rem)]">
         {/* 介绍文案 */}
-        <div className="space-y-6 z-10">
+        <div className="z-10 space-y-6 lg:absolute lg:left-0 lg:top-[38%] lg:w-[39%] lg:-translate-y-1/2">
           <p className="text-sm md:text-base font-light border border-p3blue/30 border-l-[4px] border-l-p3blue bg-p3dark/90 px-6 py-5 backdrop-blur-md max-w-lg text-p3white/90 leading-relaxed shadow-[3px_3px_0_0_rgba(18,105,204,0.5)]">
             简单写写博客，记录一些想法和经历。偶尔也会分享一些有趣的资源和工具。欢迎来到我的个人博客！希望你能在这里找到一些有价值的内容。
           </p>
         </div>
 
         {/* Featured Post Card */}
-        <div className="relative group">
-          <div className="absolute -inset-2 bg-p3cyan/30 blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="group relative z-10 lg:absolute lg:bottom-[8%] lg:right-0 lg:w-[54%] xl:w-[52%]">
           <Link
             href={blogPostPath(latestPost.id)}
-            className="block relative transform transition-transform duration-300"
+            className="relative block transform transition-transform duration-300 hover:-translate-y-1"
           >
             {/* Header Label */}
             <div className="absolute -top-4 -left-4 z-20 bg-p3red text-p3black px-4 py-1 transform -skew-x-12 font-bold shadow-lg">
               FEATURED ENTRY
             </div>
 
-            <div className="bg-p3dark/90 backdrop-blur-md border border-white/20 p-8 relative overflow-hidden group-hover:border-p3cyan transition-colors">
+            <div className="relative overflow-hidden border border-white/20 bg-p3dark/90 p-8 backdrop-blur-md transition-colors group-hover:border-white/45">
               {/* 背景纹理与大字 */}
               <div className="absolute inset-0 bg-gradient-to-br from-p3blue/10 to-transparent pointer-events-none" />
               <div className="absolute inset-0 bg-p3r-crosshatch opacity-20 pointer-events-none" />

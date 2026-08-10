@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getOrbMotionGeometry, shouldAnimateOrb } from '../src/lib/orb-motion';
+import {
+  getOrbMotionGeometry,
+  getOrbMotionState,
+  getOrbScrollProgress,
+  shouldAnimateOrb,
+} from '../src/lib/orb-motion';
 
 test('只在首页大屏且未减少动画时启用开场', () => {
   assert.equal(shouldAnimateOrb({
@@ -34,4 +39,19 @@ test('终点与现有 top/right/size 月球构图一致', () => {
   assert.ok(Math.abs(geometry.startCenterX - 835.2) < 0.001);
   assert.equal(geometry.startCenterY, 405);
   assert.equal(geometry.startSize, 522);
+});
+
+test('重建动画时从当前滚动进度恢复且边界会被夹紧', () => {
+  const geometry = getOrbMotionGeometry(1440, 900);
+
+  assert.equal(getOrbScrollProgress(-20, 900), 0);
+  assert.equal(getOrbScrollProgress(450, 900), 0.5);
+  assert.equal(getOrbScrollProgress(1200, 900), 1);
+  assert.equal(getOrbScrollProgress(1200, 0), 1);
+
+  assert.deepEqual(getOrbMotionState(geometry, 0.5), {
+    x: (geometry.startLeft + geometry.targetLeft) / 2,
+    y: (geometry.startTop + geometry.targetTop) / 2,
+    scale: (geometry.startScale + 1) / 2,
+  });
 });

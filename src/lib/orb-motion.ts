@@ -16,7 +16,14 @@ export interface OrbMotionGeometry {
   targetSize: number;
 }
 
+export interface OrbMotionState {
+  x: number;
+  y: number;
+  scale: number;
+}
+
 const DESKTOP_MIN_WIDTH = 1024;
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
 export function shouldAnimateOrb({
   pathname,
@@ -49,5 +56,29 @@ export function getOrbMotionGeometry(
     targetLeft,
     targetTop,
     targetSize,
+  };
+}
+
+export function getOrbScrollProgress(
+  scrollY: number,
+  viewportHeight: number,
+): number {
+  if (viewportHeight <= 0) return scrollY > 0 ? 1 : 0;
+  return clamp01(scrollY / viewportHeight);
+}
+
+export function getOrbMotionState(
+  geometry: OrbMotionGeometry,
+  progress: number,
+): OrbMotionState {
+  const clampedProgress = clamp01(progress);
+  const interpolate = (start: number, end: number) => (
+    start + (end - start) * clampedProgress
+  );
+
+  return {
+    x: interpolate(geometry.startLeft, geometry.targetLeft),
+    y: interpolate(geometry.startTop, geometry.targetTop),
+    scale: interpolate(geometry.startScale, 1),
   };
 }

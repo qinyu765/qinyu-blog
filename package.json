@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "mcp": "tsx mcp-server/index.ts",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.tsx",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
@@ -20,6 +20,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "fuse.js": "^7.1.0",
     "gray-matter": "^4.0.3",
+    "gsap": "^3.15.0",
     "lucide-react": "^0.562.0",
     "next": "^15.3.0",
     "react": "^19.2.3",

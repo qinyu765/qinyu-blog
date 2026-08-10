@@ -1,4 +1,5 @@
 import React from 'react';
+import { OrbScene } from '@/components/ui/OrbScene';
 
 const RIPPLE_COUNT = 7;
 
@@ -7,7 +8,7 @@ const RIPPLE_COUNT = 7;
  * 1. p3r-bg-base    — 多层径向渐变底色
  * 2. p3r-caustics   — 模拟水面焦散光斑（screen 混合 + 缓动位移）
  * 3. p3r-noise      — SVG 噪声纹理覆盖（overlay 混合）
- * 4. 残月 (moon)     — 三层：bloom 外晕 → light 月面渐变 → mask 遮罩形成残月轮廓
+ * 4. 月球场景         — OrbScene 负责分层浮动、粒子字形与首页滚动归位
  * 5. 水波纹 (ripple) — 多条 SVG 正弦曲线，各自有独立时长/延迟/透明度
  */
 const styles = `
@@ -59,43 +60,6 @@ const styles = `
     100% { transform: translate(0, 0); }
   }
 
-  .p3r-moon {
-    animation: p3r-moon-drift 12s ease-in-out infinite;
-  }
-
-  @keyframes p3r-moon-drift {
-    0%   { transform: translate3d(0,0,0); }
-    50%  { transform: translate3d(-20px,24px,0); }
-    100% { transform: translate3d(0,0,0); }
-  }
-
-  .p3r-moon-bloom {
-    position: absolute;
-    inset: -18%;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 40% 38%, rgba(81,238,252,0.18), transparent 70%);
-    filter: blur(2px);
-    opacity: 0.9;
-  }
-
-  .p3r-moon-light {
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: radial-gradient(circle at 35% 35%, rgba(81,238,252,0.80) 0%, rgba(109,154,199,0.50) 38%, transparent 72%);
-    box-shadow: 0 0 60px rgba(81,238,252,0.16), 0 0 140px rgba(81,238,252,0.09);
-    opacity: 0.9;
-  }
-
-  .p3r-moon-mask {
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: rgba(18,105,204,0.92);
-    transform: translateX(18%);
-    filter: blur(0.6px);
-  }
-
   .p3r-ripple {
     animation-name: p3r-ripple-float;
     animation-timing-function: ease-in-out;
@@ -122,13 +86,7 @@ export const BackgroundEffect: React.FC = () => {
 
       <div className="absolute inset-0 p3r-bg-base" />
       <div className="absolute inset-0 p3r-noise" />
-
-      {/* 残月：bloom 外晕 → light 月面 → mask 遮罩（translateX 偏移形成月牙） */}
-      <div className="absolute -top-[18vh] -right-[18vh] w-[70vh] h-[70vh] p3r-moon">
-        <div className="p3r-moon-bloom" />
-        <div className="p3r-moon-light" />
-        <div className="p3r-moon-mask" />
-      </div>
+      <OrbScene />
 
       {/* 水波纹：多条正弦 SVG 曲线，交替使用 cyan/mid 配色 */}
       <div className="absolute bottom-[-8%] left-0 w-full h-[60%]">

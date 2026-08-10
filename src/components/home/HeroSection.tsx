@@ -45,7 +45,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ latestPost }) => {
                   <span className="bg-p3cyan/10 px-2 py-1">{latestPost.date}</span>
                   <span className="border border-p3cyan/30 px-2 py-1 -skew-x-12"><span className="inline-block skew-x-12">{latestPost.category}</span></span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-display font-bold uppercase mb-6 text-white transition-colors leading-tight">
+                <h2 className="text-balance text-4xl md:text-5xl font-display font-bold uppercase mb-6 text-white transition-colors leading-tight">
                   {latestPost.title}
                 </h2>
                 <p className="text-p3mid font-light text-base md:text-lg leading-relaxed border-l-4 border-p3red pl-4">

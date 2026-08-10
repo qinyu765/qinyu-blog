@@ -168,44 +168,40 @@ git commit -m "feat(home): 定义月球滚动路径与降级规则"
 ### Task 3: Canvas 月球场景与 GSAP 编排
 
 **Files:**
+- Create: `src/components/ui/OrbLayers.tsx`
 - Create: `src/components/ui/OrbScene.tsx`
 - Modify: `src/components/ui/BackgroundEffect.tsx`
 - Modify: `src/app/globals.css`
 - Modify: `package.json`
 - Modify: `pnpm-lock.yaml`
-- Create: `tests/orb-scene-contract.test.ts`
+- Create: `tests/orb-layers.test.tsx`
 
 **Interfaces:**
 - Consumes: `sampleAlphaGrid`、`createWordParticles`、`particleStateAt`、`shouldAnimateOrb`、`getOrbMotionGeometry`
-- Produces: `OrbScene` 客户端组件；`BackgroundEffect` 全局只保留一个月球实例
+- Produces: `OrbLayers` 纯展示组件、`OrbScene` 客户端组件；`BackgroundEffect` 全局只保留一个月球实例
 
-- [ ] **Step 1: 写场景结构失败测试**
+- [ ] **Step 1: 写月球层真实渲染失败测试**
 
-```ts
+```tsx
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { OrbLayers } from '../src/components/ui/OrbLayers';
 
-test('OrbScene 提供无障碍粒子画布且不使用荧光样式', () => {
-  const path = new URL('../src/components/ui/OrbScene.tsx', import.meta.url);
-  assert.equal(existsSync(path), true);
-  const source = readFileSync(path, 'utf8');
-  assert.match(source, /aria-hidden="true"/);
-  assert.match(source, /pointer-events-none/);
-  assert.doesNotMatch(source, /text-shadow|drop-shadow|mix-blend-screen|#51EEFC/i);
-});
-
-test('BackgroundEffect 只挂载 OrbScene，不保留旧月球节点', () => {
-  const source = readFileSync(new URL('../src/components/ui/BackgroundEffect.tsx', import.meta.url), 'utf8');
-  assert.match(source, /<OrbScene\s*\/?>/);
-  assert.doesNotMatch(source, /p3r-moon-bloom/);
+test('OrbLayers 渲染独立月面、遮罩、外晕与无障碍粒子画布', () => {
+  const markup = renderToStaticMarkup(<OrbLayers />);
+  assert.match(markup, /p3r-orb-bloom/);
+  assert.match(markup, /p3r-orb-light/);
+  assert.match(markup, /p3r-orb-mask/);
+  assert.match(markup, /<canvas[^>]*aria-hidden="true"/);
+  assert.match(markup, /pointer-events-none/);
 });
 ```
 
 - [ ] **Step 2: 运行测试并确认结构尚不存在**
 
-Run: `pnpm exec tsx --test tests/orb-scene-contract.test.ts`
-Expected: FAIL 于 `existsSync(path) === true` 或 `<OrbScene />` 断言。
+Run: `pnpm exec tsx --test tests/orb-layers.test.tsx`
+Expected: FAIL，错误包含 `Cannot find module '../src/components/ui/OrbLayers'`。
 
 - [ ] **Step 3: 安装 GSAP**
 
@@ -226,13 +222,13 @@ Expected: `package.json` 与 `pnpm-lock.yaml` 新增 `gsap`，不引入 Three.js
 
 - [ ] **Step 7: 运行场景测试、类型检查和构建**
 
-Run: `pnpm exec tsx --test tests/orb-scene-contract.test.ts && pnpm typecheck && pnpm build`
-Expected: 场景合同测试 PASS、TypeScript 0 错误、Next 静态导出成功。
+Run: `pnpm exec tsx --test tests/orb-layers.test.tsx && pnpm typecheck && pnpm build`
+Expected: 月球层真实渲染测试 PASS、TypeScript 0 错误、Next 静态导出成功。
 
 - [ ] **Step 8: 提交场景实现**
 
 ```bash
-git add package.json pnpm-lock.yaml src/components/ui/OrbScene.tsx src/components/ui/BackgroundEffect.tsx src/app/globals.css tests/orb-scene-contract.test.ts
+git add package.json pnpm-lock.yaml src/components/ui/OrbLayers.tsx src/components/ui/OrbScene.tsx src/components/ui/BackgroundEffect.tsx src/app/globals.css tests/orb-layers.test.tsx
 git commit -m "feat(home): 实现月球粒子滚动开场"
 ```
 
@@ -243,40 +239,34 @@ git commit -m "feat(home): 实现月球粒子滚动开场"
 - Modify: `src/components/home/AboutSection.tsx`
 - Modify: `src/components/ArticleView.tsx`
 - Modify: `src/app/blog/BlogListClient.tsx`
-- Create: `tests/ui-style-contracts.test.ts`
+- Create: `tests/hero-section.test.tsx`
 
 **Interfaces:**
 - Produces: 带 `data-home-orb-trigger` 的一视口 Hero；无霓虹外发光的卡片和状态装饰
 
-- [ ] **Step 1: 写布局与去荧光失败测试**
+- [ ] **Step 1: 写 Hero 真实渲染失败测试**
 
-```ts
+```tsx
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import test from 'node:test';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { HeroSection } from '../src/components/home/HeroSection';
 
-const source = (path: string) => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
-
-test('Hero 提供滚动触发区且精选卡片没有模糊外发光', () => {
-  const hero = source('src/components/home/HeroSection.tsx');
-  assert.match(hero, /data-home-orb-trigger/);
-  assert.match(hero, /min-h-\[calc\(100svh-5rem\)\]/);
-  assert.doesNotMatch(hero, /blur-lg|bg-p3cyan\/30/);
-});
-
-test('状态装饰不再使用 0 0 发光阴影', () => {
-  for (const path of [
-    'src/components/home/AboutSection.tsx',
-    'src/components/ArticleView.tsx',
-    'src/app/blog/BlogListClient.tsx',
-  ]) assert.doesNotMatch(source(path), /shadow-\[0_0_/);
+test('Hero 渲染一视口触发区且 Featured 面板没有模糊外圈', () => {
+  const markup = renderToStaticMarkup(<HeroSection latestPost={{
+    id: 'entry', title: '测试文章', date: '2026.08.10', category: 'TECH',
+    excerpt: '用于验证首页布局。', content: '',
+  }} />);
+  assert.match(markup, /data-home-orb-trigger="true"/);
+  assert.match(markup, /lg:min-h-\[calc\(100svh-5rem\)\]/);
+  assert.doesNotMatch(markup, /blur-lg|bg-p3cyan\/30/);
 });
 ```
 
 - [ ] **Step 2: 运行测试并确认新合同尚未满足**
 
-Run: `pnpm exec tsx --test tests/ui-style-contracts.test.ts`
-Expected: FAIL 于 Hero trigger/min-height 或现有 glow class 断言。
+Run: `pnpm exec tsx --test tests/hero-section.test.tsx`
+Expected: FAIL 于 Hero trigger/min-height 或现有 Featured blur class 断言。
 
 - [ ] **Step 3: 重排桌面 Hero，保留小屏现有阅读布局**
 
@@ -288,13 +278,13 @@ Expected: FAIL 于 Hero trigger/min-height 或现有 glow class 断言。
 
 - [ ] **Step 5: 运行定向和全量检查**
 
-Run: `pnpm exec tsx --test tests/ui-style-contracts.test.ts && pnpm lint && pnpm typecheck && pnpm test`
-Expected: 样式合同、lint、类型检查和全部测试 PASS，ESLint 无 error。
+Run: `pnpm exec tsx --test tests/hero-section.test.tsx && pnpm lint && pnpm typecheck && pnpm test`
+Expected: Hero 真实渲染、lint、类型检查和全部测试 PASS，ESLint 无 error；其他去荧光项在 Task 5 截图验证。
 
 - [ ] **Step 6: 提交布局与视觉清理**
 
 ```bash
-git add src/components/home/HeroSection.tsx src/components/home/AboutSection.tsx src/components/ArticleView.tsx src/app/blog/BlogListClient.tsx tests/ui-style-contracts.test.ts
+git add src/components/home/HeroSection.tsx src/components/home/AboutSection.tsx src/components/ArticleView.tsx src/app/blog/BlogListClient.tsx tests/hero-section.test.tsx
 git commit -m "style(blog): 调整首页层叠构图并移除霓虹光晕"
 ```
 

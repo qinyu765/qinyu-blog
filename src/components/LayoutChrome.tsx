@@ -20,7 +20,7 @@ const NAV_ITEMS = [
 export const LayoutChrome = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { clearHomeSection } = useHomeEntry();
+  const { clearHomeSection, replayHomeIntro } = useHomeEntry();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isSearchActive = pathname === '/blog' && searchParams.get('search') === '1';
 
@@ -48,8 +48,14 @@ export const LayoutChrome = () => {
         shiftKey: event.shiftKey,
       },
     });
-    if (intent === 'clear') {
+    if (intent === 'intro') {
+      if (pathname === '/') {
+        event.preventDefault();
+        window.history.pushState(null, '', '/');
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
       clearHomeSection();
+      replayHomeIntro();
     }
   };
 

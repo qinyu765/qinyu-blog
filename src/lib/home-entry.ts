@@ -6,8 +6,10 @@ export type OrbEntryMode = 'intro' | 'anchor' | 'resting';
 
 export interface HomeEntryContextValue {
   pendingHomeSection: HomeSection | null;
+  homeIntroKey: number;
   prepareHomeSection(section: HomeSection): void;
   clearHomeSection(): void;
+  replayHomeIntro(): void;
 }
 
 export interface OrbEntryContext {
@@ -36,7 +38,7 @@ interface HomeNavigationContext {
   activation: NavigationActivation;
 }
 
-export type HomeNavigationIntent = HomeSection | 'clear' | null;
+export type HomeNavigationIntent = HomeSection | 'intro' | null;
 
 export function isPlainNavigationActivation(
   activation: NavigationActivation,
@@ -59,6 +61,10 @@ export function reduceHomeEntryIntent(
   return null;
 }
 
+export function reduceHomeIntroKey(state: number): number {
+  return state + 1;
+}
+
 export function getHomeSectionFromHash(hash: string): HomeSection | null {
   const section = hash.replace(/^#/, '');
   return section === 'about' || section === 'favorites' ? section : null;
@@ -74,7 +80,7 @@ export function getHomeNavigationIntent({
   }
 
   if (href === '/') {
-    return 'clear';
+    return 'intro';
   }
 
   if (pathname === '/') {

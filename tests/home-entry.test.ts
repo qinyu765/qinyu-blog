@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   getHomeNavigationIntent,
   reduceHomeEntryIntent,
+  reduceHomeIntroKey,
   resolveOrbEntryMode,
 } from '../src/lib/home-entry';
 
@@ -87,7 +88,7 @@ test('只有普通跨页锚点导航会准备首页区块意图', () => {
   }), null);
 });
 
-test('普通 HOME 导航会清除残留的首页区块意图', () => {
+test('普通 HOME 导航会请求重新播放首页开场', () => {
   assert.equal(getHomeNavigationIntent({
     pathname: '/blog',
     href: '/',
@@ -98,5 +99,6 @@ test('普通 HOME 导航会清除残留的首页区块意图', () => {
       metaKey: false,
       shiftKey: false,
     },
-  }), 'clear');
+  }), 'intro');
+  assert.equal(reduceHomeIntroKey(4), 5);
 });

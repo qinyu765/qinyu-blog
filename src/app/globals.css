@@ -37,6 +37,72 @@
   100% { transform: translateX(0); }
 }
 
+/* 月球场景：外层只负责滚动位移，内部三层使用不同周期交错浮动 */
+.p3r-orb-motion {
+  position: absolute;
+  left: calc(100vw - 52vh);
+  top: -18vh;
+  width: 70vh;
+  height: 70vh;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.p3r-orb-bloom {
+  inset: -18%;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 40% 38%, rgba(81, 238, 252, 0.18), transparent 70%);
+  filter: blur(2px);
+  opacity: 0.9;
+  animation: p3r-orb-bloom-breathe 17s ease-in-out -5s infinite;
+}
+
+.p3r-orb-light {
+  z-index: 1;
+  background: radial-gradient(circle at 35% 35%, rgba(81, 238, 252, 0.8) 0%, rgba(109, 154, 199, 0.5) 38%, transparent 72%);
+  box-shadow: 0 0 60px rgba(81, 238, 252, 0.16), 0 0 140px rgba(81, 238, 252, 0.09);
+  opacity: 0.9;
+  animation: p3r-orb-core-drift 8s ease-in-out -1.5s infinite;
+}
+
+.p3r-orb-mask {
+  z-index: 2;
+  background: rgba(18, 105, 204, 0.92);
+  filter: blur(0.6px);
+  animation: p3r-orb-mask-drift 12.5s ease-in-out -7s infinite;
+}
+
+.p3r-orb-wordmark {
+  animation: p3r-orb-core-drift 8s ease-in-out -1.5s infinite;
+}
+
+@keyframes p3r-orb-core-drift {
+  0%, 100% { transform: translate3d(-4px, 2px, 0); }
+  45% { transform: translate3d(6px, -7px, 0); }
+  75% { transform: translate3d(1px, 5px, 0); }
+}
+
+@keyframes p3r-orb-mask-drift {
+  0%, 100% { transform: translate3d(17%, 5px, 0); }
+  38% { transform: translate3d(19%, -4px, 0); }
+  72% { transform: translate3d(18%, 8px, 0); }
+}
+
+@keyframes p3r-orb-bloom-breathe {
+  0%, 100% { transform: translate3d(5px, -3px, 0) scale(0.98); opacity: 0.68; }
+  50% { transform: translate3d(-7px, 6px, 0) scale(1.05); opacity: 0.95; }
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .p3r-orb-motion[data-home-intro="true"] {
+    left: 58vw;
+    top: 45vh;
+    width: min(58vh, 52vw);
+    height: min(58vh, 52vw);
+    transform: translate3d(-50%, -50%, 0);
+  }
+}
+
 /* P3R 风格斜纹背景纹理（跨组件复用） */
 @utility bg-p3r-crosshatch {
   background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTAgOEw4IDBaIiBzdHJva2U9IiMzMzMiIHN0cm9rZS13aWR0aD0iMSIvPjwvc3ZnPg==');
@@ -76,5 +142,15 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .p3r-orb-light,
+  .p3r-orb-wordmark,
+  .p3r-orb-bloom {
+    transform: none !important;
+  }
+
+  .p3r-orb-mask {
+    transform: translateX(18%) !important;
   }
 }

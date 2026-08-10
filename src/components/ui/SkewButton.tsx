@@ -18,7 +18,11 @@ interface SkewButtonProps {
 
 export const SkewButton: React.FC<SkewButtonProps> = ({ href, children, isActive, hoverActive = false }) => {
   const pathname = usePathname();
-  const { prepareHomeSection, clearHomeSection } = useHomeEntry();
+  const {
+    prepareHomeSection,
+    clearHomeSection,
+    replayHomeIntro,
+  } = useHomeEntry();
   const [targetPath] = href.split('?');
   const active = isActive !== undefined ? isActive : pathname === targetPath;
 
@@ -32,8 +36,14 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ href, children, isActive
     };
     const intent = getHomeNavigationIntent({ pathname, href, activation });
 
-    if (intent === 'clear') {
+    if (intent === 'intro') {
+      if (pathname === '/') {
+        event.preventDefault();
+        window.history.pushState(null, '', '/');
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
       clearHomeSection();
+      replayHomeIntro();
     } else if (intent !== null) {
       prepareHomeSection(intent);
     }
@@ -46,7 +56,7 @@ export const SkewButton: React.FC<SkewButtonProps> = ({ href, children, isActive
         event.preventDefault();
         window.history.pushState(null, '', `#${hashPart}`);
         document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
-      } else if (window.location.hash === '') {
+      } else if (intent !== 'intro' && window.location.hash === '') {
         event.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }

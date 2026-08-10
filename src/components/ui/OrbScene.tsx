@@ -87,7 +87,7 @@ function clearCanvas(canvas: HTMLCanvasElement) {
 
 export const OrbScene: React.FC = () => {
   const pathname = usePathname();
-  const { pendingHomeSection } = useHomeEntry();
+  const { pendingHomeSection, homeIntroKey } = useHomeEntry();
   const motionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -249,7 +249,7 @@ export const OrbScene: React.FC = () => {
       window.removeEventListener('resize', scheduleInitialize);
       disposeAnimation();
     };
-  }, [pathname, pendingHomeSection]);
+  }, [homeIntroKey, pathname, pendingHomeSection]);
 
   return (
     <div

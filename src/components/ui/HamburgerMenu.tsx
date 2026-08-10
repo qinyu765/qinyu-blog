@@ -22,7 +22,11 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   navItems,
 }) => {
   const pathname = usePathname();
-  const { prepareHomeSection, clearHomeSection } = useHomeEntry();
+  const {
+    prepareHomeSection,
+    clearHomeSection,
+    replayHomeIntro,
+  } = useHomeEntry();
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -82,8 +86,14 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                     href: item.path,
                     activation,
                   });
-                  if (intent === 'clear') {
+                  if (intent === 'intro') {
+                    if (pathname === '/') {
+                      event.preventDefault();
+                      window.history.pushState(null, '', '/');
+                      window.scrollTo({ top: 0, behavior: 'auto' });
+                    }
                     clearHomeSection();
+                    replayHomeIntro();
                   } else if (intent !== null) {
                     prepareHomeSection(intent);
                   }
@@ -95,7 +105,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                       event.preventDefault();
                       window.history.pushState(null, '', `#${hashPart}`);
                       document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
-                    } else if (window.location.hash === '') {
+                    } else if (intent !== 'intro' && window.location.hash === '') {
                       event.preventDefault();
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }

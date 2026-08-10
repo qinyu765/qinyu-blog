@@ -9,7 +9,12 @@ import {
   sampleAlphaGrid,
   type WordParticle,
 } from '@/lib/orb-particles';
-import { getOrbMotionGeometry, shouldAnimateOrb } from '@/lib/orb-motion';
+import {
+  getOrbMotionGeometry,
+  getOrbMotionState,
+  getOrbScrollProgress,
+  shouldAnimateOrb,
+} from '@/lib/orb-motion';
 
 const PARTICLE_SEED = 0x4c494e;
 
@@ -92,6 +97,7 @@ export const OrbScene: React.FC = () => {
     const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     let setupVersion = 0;
     let resizeFrame = 0;
+    let resizeTimer = 0;
     let disposeAnimation = () => {};
 
     const applyRestingState = () => {
@@ -110,8 +116,6 @@ export const OrbScene: React.FC = () => {
     const initialize = async () => {
       setupVersion += 1;
       const currentVersion = setupVersion;
-      disposeAnimation();
-      disposeAnimation = () => {};
 
       const animate = shouldAnimateOrb({
         pathname,
@@ -119,33 +123,39 @@ export const OrbScene: React.FC = () => {
         reducedMotion: reducedMotionQuery.matches,
       });
       if (!animate) {
+        disposeAnimation();
+        disposeAnimation = () => {};
         applyRestingState();
         return;
       }
 
       const geometry = getOrbMotionGeometry(window.innerWidth, window.innerHeight);
-      Object.assign(motionElement.style, {
-        left: '0px',
-        top: '0px',
-        width: `${geometry.targetSize}px`,
-        height: `${geometry.targetSize}px`,
-        transform: `translate3d(${geometry.startLeft}px, ${geometry.startTop}px, 0) scale(${geometry.startScale})`,
-        transformOrigin: 'top left',
-      });
+      let disposeReplacement = () => {};
 
       try {
-        await document.fonts.ready;
+        const [, { gsap }, { ScrollTrigger }] = await Promise.all([
+          document.fonts.ready,
+          import('gsap'),
+          import('gsap/ScrollTrigger'),
+        ]);
+        if (currentVersion !== setupVersion) return;
+
+        const scrollProgress = getOrbScrollProgress(
+          window.scrollY,
+          window.innerHeight,
+        );
+        const motionState = getOrbMotionState(geometry, scrollProgress);
+
+        // 新依赖与几何都准备好后再同步替换，避免 resize 时闪回起点。
+        disposeAnimation();
+        disposeAnimation = () => {};
+
         const renderer = createParticleRenderer(canvas, geometry.targetSize);
         if (!renderer) {
           applyRestingState();
           return;
         }
-
-        const [{ gsap }, { ScrollTrigger }] = await Promise.all([
-          import('gsap'),
-          import('gsap/ScrollTrigger'),
-        ]);
-        if (currentVersion !== setupVersion) return;
+        disposeReplacement = renderer.clear;
 
         gsap.registerPlugin(ScrollTrigger);
         gsap.set(motionElement, {
@@ -154,7 +164,11 @@ export const OrbScene: React.FC = () => {
           width: geometry.targetSize,
           height: geometry.targetSize,
           transformOrigin: 'top left',
+          x: motionState.x,
+          y: motionState.y,
+          scale: motionState.scale,
         });
+        renderer.draw(scrollProgress);
 
         const timeline = gsap.timeline({
           scrollTrigger: {
@@ -179,25 +193,38 @@ export const OrbScene: React.FC = () => {
             scale: 1,
             duration: 1,
             ease: 'none',
+            immediateRender: false,
           },
         );
-        renderer.draw(timeline.scrollTrigger?.progress ?? 0);
-        ScrollTrigger.refresh();
 
-        disposeAnimation = () => {
+        timeline.progress(scrollProgress);
+        ScrollTrigger.refresh();
+        renderer.draw(timeline.scrollTrigger?.progress ?? scrollProgress);
+
+        disposeReplacement = () => {
           timeline.scrollTrigger?.kill();
           timeline.kill();
           renderer.clear();
         };
+        disposeAnimation = disposeReplacement;
+        disposeReplacement = () => {};
       } catch {
+        disposeReplacement();
+        if (currentVersion !== setupVersion) return;
+        disposeAnimation();
+        disposeAnimation = () => {};
         applyRestingState();
       }
     };
 
     const scheduleInitialize = () => {
+      setupVersion += 1;
       window.cancelAnimationFrame(resizeFrame);
+      window.clearTimeout(resizeTimer);
       resizeFrame = window.requestAnimationFrame(() => {
-        void initialize();
+        resizeTimer = window.setTimeout(() => {
+          void initialize();
+        }, 120);
       });
     };
 
@@ -209,6 +236,7 @@ export const OrbScene: React.FC = () => {
     return () => {
       setupVersion += 1;
       window.cancelAnimationFrame(resizeFrame);
+      window.clearTimeout(resizeTimer);
       desktopQuery.removeEventListener('change', scheduleInitialize);
       reducedMotionQuery.removeEventListener('change', scheduleInitialize);
       window.removeEventListener('resize', scheduleInitialize);

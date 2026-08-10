@@ -25,7 +25,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   const {
     prepareHomeSection,
     clearHomeSection,
-    replayHomeIntro,
+    requestHomeIntro,
   } = useHomeEntry();
   const [isMounted, setIsMounted] = React.useState(false);
 
@@ -86,14 +86,14 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                     href: item.path,
                     activation,
                   });
-                  if (intent === 'intro') {
+                  if (intent === 'fresh' || intent === 'returning') {
                     if (pathname === '/') {
                       event.preventDefault();
                       window.history.pushState(null, '', '/');
                       window.scrollTo({ top: 0, behavior: 'auto' });
                     }
                     clearHomeSection();
-                    replayHomeIntro();
+                    requestHomeIntro(intent);
                   } else if (intent !== null) {
                     prepareHomeSection(intent);
                   }
@@ -105,7 +105,11 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
                       event.preventDefault();
                       window.history.pushState(null, '', `#${hashPart}`);
                       document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
-                    } else if (intent !== 'intro' && window.location.hash === '') {
+                    } else if (
+                      intent !== 'fresh'
+                      && intent !== 'returning'
+                      && window.location.hash === ''
+                    ) {
                       event.preventDefault();
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }

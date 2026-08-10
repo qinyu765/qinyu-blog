@@ -72,7 +72,7 @@
 }
 
 .p3r-orb-wordmark {
-  transform: none;
+  transform: translateX(18%);
 }
 
 @keyframes p3r-orb-core-drift {
@@ -118,18 +118,22 @@
     will-change: transform;
   }
 
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom {
+  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
+  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-bloom {
     animation: p3r-orb-bloom-breathe 17s linear -5s infinite;
     will-change: transform, opacity;
   }
 
   .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
+  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-light {
     animation: p3r-orb-core-drift 9s linear -2.25s infinite;
     will-change: transform;
   }
 
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask {
+  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
+  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
+  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-mask,
+  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-wordmark {
     animation: p3r-orb-mask-drift 13s linear -7.5s infinite;
     will-change: transform;
   }
@@ -148,17 +152,17 @@ body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] {
 
 body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
 body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
 body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light {
   animation: none;
   transform: none;
   will-change: auto;
 }
 
 body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask {
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
   animation: none;
   transform: translateX(18%);
   will-change: auto;
@@ -206,12 +210,12 @@ body {
   }
 
   .p3r-orb-light,
-  .p3r-orb-wordmark,
   .p3r-orb-bloom {
     transform: none !important;
   }
 
-  .p3r-orb-mask {
+  .p3r-orb-mask,
+  .p3r-orb-wordmark {
     transform: translateX(18%) !important;
   }
 }

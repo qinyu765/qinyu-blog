@@ -62,13 +62,13 @@ export function createWordParticles(
 
   return origins.map((origin) => {
     const angle = random() * Math.PI * 2;
-    const distance = 8 + random() * 20;
+    const distance = 6 + random() * 14;
 
     return {
       ...origin,
       driftX: Math.cos(angle) * distance,
       driftY: Math.sin(angle) * distance,
-      delay: random() * 0.18,
+      delay: random() * 0.12,
       radius: 0.8 + random(),
       color: random() < 0.82 ? '#F0F0F0' : '#CBD6E2',
     };
@@ -79,7 +79,7 @@ export function particleStateAt(
   particle: WordParticle,
   scrollProgress: number,
 ): RenderParticle {
-  const dissolveProgress = clamp01((scrollProgress - 0.08) / 0.82);
+  const dissolveProgress = clamp01((scrollProgress - 0.10) / 0.72);
   const localProgress = clamp01(
     (dissolveProgress - particle.delay) / (1 - particle.delay),
   );

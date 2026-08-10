@@ -12,4 +12,5 @@ test('OrbLayers 渲染独立月面、遮罩、外晕与无障碍粒子画布', (
   assert.match(markup, /p3r-orb-mask/);
   assert.match(markup, /<canvas[^>]*aria-hidden="true"/);
   assert.match(markup, /pointer-events-none/);
+  assert.match(markup, /p3r-orb-wordmark[^>]*z-\[3\]/);
 });

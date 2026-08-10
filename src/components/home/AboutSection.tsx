@@ -73,7 +73,7 @@ export const AboutSection: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-p3cyan/5 to-transparent opacity-0 transition-opacity duration-500 pointer-events-none" />
           <div className="relative z-10">
             <h2 className="text-xl font-bold uppercase text-p3cyan mb-6 mt-3 flex items-center">
-              <span className="w-2 h-2 bg-white mr-3 shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+              <span className="w-2 h-2 bg-white mr-3" />
               Skills
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -95,7 +95,7 @@ export const AboutSection: React.FC = () => {
 
                       <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden relative shadow-inner mt-4">
                         <div
-                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-p3cyan/80 to-p3blue rounded-full shadow-[0_0_8px_rgba(18,105,204,0.6)] transition-transform duration-[1500ms] ease-out will-change-transform origin-left"
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-p3cyan/80 to-p3blue rounded-full transition-transform duration-[1500ms] ease-out will-change-transform origin-left"
                           style={{
                             width: skill.width,
                             transform: isVisible ? 'scaleX(1)' : 'scaleX(0)',

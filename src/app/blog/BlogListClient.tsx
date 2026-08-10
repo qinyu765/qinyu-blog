@@ -138,7 +138,7 @@ export const BlogListClient: React.FC<BlogListClientProps> = ({ posts }) => {
         ) : (
           <div className="text-center py-20">
             <div className="text-3xl font-display italic text-white/20 mb-4">NO RECORDS FOUND</div>
-            <div className="w-3 h-3 bg-p3red shadow-[0_0_12px_rgba(244,2,32,0.8)] mx-auto animate-spin rotate-45" />
+            <div className="w-3 h-3 bg-p3red mx-auto animate-spin rotate-45" />
           </div>
         )}
       </div>

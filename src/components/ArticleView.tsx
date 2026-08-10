@@ -71,7 +71,7 @@ export const ArticleView = ({
         <div className="mt-16 pt-8 border-t border-white/10">
           <div className="text-center mb-8">
             <p className="text-sm text-p3mid/50 mb-2">END OF RECORD</p>
-            <div className="w-2 h-2 bg-p3red shadow-[0_0_10px_rgba(244,2,32,0.75)] transform rotate-45 mx-auto animate-pulse" />
+            <div className="w-2 h-2 bg-p3red transform rotate-45 mx-auto animate-pulse" />
           </div>
           <div className="flex justify-between items-stretch gap-4">
             {prevPost ? (

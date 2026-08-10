@@ -36,7 +36,7 @@ test('终点与现有 top/right/size 月球构图一致', () => {
   assert.equal(geometry.targetSize, 630);
   assert.equal(geometry.targetTop, -162);
   assert.equal(geometry.targetLeft, 972);
-  assert.ok(Math.abs(geometry.startCenterX - 835.2) < 0.001);
+  assert.equal(geometry.startCenterX, 720);
   assert.equal(geometry.startCenterY, 405);
   assert.equal(geometry.startSize, 522);
 });

@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { SkewButton } from '@/components/ui/SkewButton';
 import { HamburgerMenu, HamburgerButton } from '@/components/ui/HamburgerMenu';
+import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
+import { getHomeNavigationIntent } from '@/lib/home-entry';
 
 const NAV_ITEMS = [
   { label: 'HOME', path: '/' },
@@ -18,6 +20,7 @@ const NAV_ITEMS = [
 export const LayoutChrome = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { clearHomeSection } = useHomeEntry();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const isSearchActive = pathname === '/blog' && searchParams.get('search') === '1';
 
@@ -32,6 +35,23 @@ export const LayoutChrome = () => {
       document.body.style.overflow = '';
     };
   }, [isMobileMenuOpen]);
+
+  const handleHomeClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    const intent = getHomeNavigationIntent({
+      pathname,
+      href: '/',
+      activation: {
+        button: event.button,
+        altKey: event.altKey,
+        ctrlKey: event.ctrlKey,
+        metaKey: event.metaKey,
+        shiftKey: event.shiftKey,
+      },
+    });
+    if (intent === 'clear') {
+      clearHomeSection();
+    }
+  };
 
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
@@ -51,7 +71,7 @@ export const LayoutChrome = () => {
         style={{ maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)', WebkitMaskImage: 'linear-gradient(to bottom, black 30%, transparent 100%)' }}
       >
         <div className="hidden md:flex flex-1 min-w-0 items-center space-x-2 text-sm font-mono text-p3cyan tracking-wider">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link href="/" onClick={handleHomeClick} className="flex items-center hover:opacity-80 transition-opacity">
             <Image
               src="/logo.svg"
               alt="Logo"
@@ -61,7 +81,7 @@ export const LayoutChrome = () => {
             />
           </Link>
           <span className="text-p3blue"> ❯❯ </span>
-          <Link href="/" className="hover:text-white transition-colors">
+          <Link href="/" onClick={handleHomeClick} className="hover:text-white transition-colors">
             SYSTEM
           </Link>
           <span>{'//'}</span>
@@ -90,22 +110,20 @@ export const LayoutChrome = () => {
 
         <nav
           aria-label="Primary"
-          className="hidden md:flex items-center justify-end gap-2"
+          className="hidden md:flex items-center justify-end gap-1.5"
         >
           {NAV_ITEMS.map((item) => (
             <SkewButton key={item.path} href={item.path}>
               {item.label}
             </SkewButton>
           ))}
-          <div className="ml-10">
-            <SkewButton href="/blog?search=1" hoverActive isActive={isSearchActive}>
-              <span className="flex items-center gap-1.5"><Search size={14} />Search</span>
-            </SkewButton>
-          </div>
+          <SkewButton href="/blog?search=1" hoverActive isActive={isSearchActive}>
+            <span className="flex items-center gap-1.5"><Search size={13} />Search</span>
+          </SkewButton>
         </nav>
 
         <div className="md:hidden flex items-center">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link href="/" onClick={handleHomeClick} className="flex items-center hover:opacity-80 transition-opacity">
             <Image
               src="/logo.svg"
               alt="Logo"

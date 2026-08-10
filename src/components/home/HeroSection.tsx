@@ -22,17 +22,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ latestPost }) => {
         </div>
 
         {/* Featured Post Card */}
-        <div className="group relative z-10 lg:absolute lg:bottom-[8%] lg:right-0 lg:w-[54%] xl:w-[52%]">
+        <div className="relative z-10 lg:absolute lg:bottom-[8%] lg:right-0 lg:w-[54%] xl:w-[52%]">
           <Link
             href={blogPostPath(latestPost.id)}
-            className="relative block transform transition-transform duration-300 hover:-translate-y-1"
+            className="group relative block transform transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1 focus-visible:outline-none"
           >
             {/* Header Label */}
             <div className="absolute -top-4 -left-4 z-20 bg-p3red text-p3black px-4 py-1 transform -skew-x-12 font-bold shadow-lg">
               FEATURED ENTRY
             </div>
 
-            <div className="relative overflow-hidden border border-white/20 bg-p3dark/90 p-8 backdrop-blur-md transition-colors group-hover:border-white/45">
+            <div className="relative overflow-hidden border border-white/20 bg-p3dark/90 p-8 backdrop-blur-md transition-colors group-hover:border-p3blue group-focus-visible:border-p3blue">
               {/* 背景纹理与大字 */}
               <div className="absolute inset-0 bg-gradient-to-br from-p3blue/10 to-transparent pointer-events-none" />
               <div className="absolute inset-0 bg-p3r-crosshatch opacity-20 pointer-events-none" />

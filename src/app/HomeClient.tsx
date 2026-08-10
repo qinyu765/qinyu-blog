@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useLayoutEffect } from 'react';
 import { BlogPost } from '@/types';
 import { CategoryGroup } from '@/lib/favorites';
+import { getHomeSectionFromHash } from '@/lib/home-entry';
+import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
 import { HeroSection } from '@/components/home/HeroSection';
 import { RecentLogs } from '@/components/home/RecentLogs';
 import { AboutSection } from '@/components/home/AboutSection';
@@ -15,27 +16,22 @@ interface HomeClientProps {
 }
 
 export const HomeClient: React.FC<HomeClientProps> = ({ posts, favorites }) => {
-  const searchParams = useSearchParams();
-  const aboutRef = useRef<HTMLDivElement>(null);
-  const favoritesRef = useRef<HTMLDivElement>(null);
+  const { pendingHomeSection, clearHomeSection } = useHomeEntry();
 
-  // hash 锚点滚动（#about / #favorites）
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash === '#about' || hash === '#favorites') {
-      const scrollAttempt = () => {
-        const targetEl = hash === '#about'
-          ? aboutRef.current?.querySelector('#about')
-          : favoritesRef.current?.querySelector('#favorites');
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: 'smooth' });
-        } else {
-          setTimeout(scrollAttempt, 50);
-        }
-      };
-      setTimeout(scrollAttempt, 100);
+  useLayoutEffect(() => {
+    const section = pendingHomeSection
+      ?? getHomeSectionFromHash(window.location.hash);
+    if (section === null) return;
+
+    const target = document.getElementById(section);
+    if (target) {
+      target.scrollIntoView({ behavior: 'auto', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
-  }, [searchParams]);
+
+    clearHomeSection();
+  }, [clearHomeSection, pendingHomeSection]);
 
   if (!posts.length) {
     return (
@@ -59,10 +55,10 @@ export const HomeClient: React.FC<HomeClientProps> = ({ posts, favorites }) => {
     <div className="flex flex-col gap-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <HeroSection latestPost={latestPost} />
       <RecentLogs posts={otherPosts} />
-      <div ref={aboutRef}>
+      <div>
         <AboutSection />
       </div>
-      <div ref={favoritesRef}>
+      <div>
         <FavoritesSection favorites={favorites} />
       </div>
     </div>

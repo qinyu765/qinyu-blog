@@ -76,25 +76,25 @@
 }
 
 @keyframes p3r-orb-core-drift {
-  0%, 100% { transform: translate3d(-4px, 2px, 0); }
-  45% { transform: translate3d(6px, -7px, 0); }
-  75% { transform: translate3d(1px, 5px, 0); }
+  0%, 100% { transform: translate3d(-5px, 4px, 0); }
+  43% { transform: translate3d(7px, -6px, 0); }
+  76% { transform: translate3d(2px, 6px, 0); }
 }
 
 @keyframes p3r-orb-mask-drift {
-  0%, 100% { transform: translate3d(17%, 5px, 0); }
-  38% { transform: translate3d(19%, -4px, 0); }
-  72% { transform: translate3d(18%, 8px, 0); }
+  0%, 100% { transform: translate3d(calc(18% - 8px), 6px, 0); }
+  39% { transform: translate3d(calc(18% + 9px), -8px, 0); }
+  73% { transform: translate3d(calc(18% + 2px), 9px, 0); }
 }
 
 @keyframes p3r-orb-bloom-breathe {
-  0%, 100% { transform: translate3d(5px, -3px, 0) scale(0.98); opacity: 0.68; }
-  50% { transform: translate3d(-7px, 6px, 0) scale(1.05); opacity: 0.95; }
+  0%, 100% { transform: translate3d(5px, -4px, 0) scale(0.98); opacity: 0.68; }
+  50% { transform: translate3d(-5px, 6px, 0) scale(1.04); opacity: 0.92; }
 }
 
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
   .p3r-orb-motion[data-home-intro="true"] {
-    left: 58vw;
+    left: 50vw;
     top: 45vh;
     width: min(58vh, 52vw);
     height: min(58vh, 52vw);
@@ -109,14 +109,43 @@
 
   .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
   .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
-    animation: p3r-orb-core-drift 8s ease-in-out -1.5s infinite;
+    animation: p3r-orb-core-drift 9s ease-in-out -2.25s infinite;
     will-change: transform;
   }
 
   .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask {
-    animation: p3r-orb-mask-drift 12.5s ease-in-out -7s infinite;
+    animation: p3r-orb-mask-drift 13s ease-in-out -7.5s infinite;
     will-change: transform;
   }
+}
+
+/* 直接打开首页锚点时，在 React 接管前也保持右上角终态。 */
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"],
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] {
+  left: calc(100vw - 52vh);
+  top: -18vh;
+  width: 70vh;
+  height: 70vh;
+  transform: none;
+  will-change: auto;
+}
+
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
+  animation: none;
+  transform: none;
+  will-change: auto;
+}
+
+body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
+body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask {
+  animation: none;
+  transform: translateX(18%);
+  will-change: auto;
 }
 
 /* P3R 风格斜纹背景纹理（跨组件复用） */

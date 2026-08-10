@@ -79,8 +79,9 @@ function createParticleRenderer(
 }
 
 function clearCanvas(canvas: HTMLCanvasElement) {
-  const context = canvas.getContext('2d');
-  context?.clearRect(0, 0, canvas.width, canvas.height);
+  // 静态终态不再需要像素缓冲，缩小 backing store 以释放高 DPR 画布内存。
+  canvas.width = 1;
+  canvas.height = 1;
 }
 
 export const OrbScene: React.FC = () => {
@@ -164,6 +165,8 @@ export const OrbScene: React.FC = () => {
           width: geometry.targetSize,
           height: geometry.targetSize,
           transformOrigin: 'top left',
+          xPercent: 0,
+          yPercent: 0,
           x: motionState.x,
           y: motionState.y,
           scale: motionState.scale,

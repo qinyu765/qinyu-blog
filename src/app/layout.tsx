@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { HomeEntryProvider } from '@/components/providers/HomeEntryProvider';
 import { websiteJsonLd, personJsonLd } from '@/lib/structured-data';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
 
@@ -52,7 +53,7 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body text-white selection:bg-p3cyan selection:text-black">
-        {children}
+        <HomeEntryProvider>{children}</HomeEntryProvider>
       </body>
     </html>
   );

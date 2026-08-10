@@ -20,5 +20,8 @@ test('Hero 渲染一视口触发区且 Featured 面板没有模糊外圈', () =>
 
   assert.match(markup, /data-home-orb-trigger="true"/);
   assert.match(markup, /lg:min-h-\[calc\(100svh-5rem\)\]/);
+  assert.match(markup, /group-hover:border-p3blue/);
+  assert.match(markup, /group-focus-visible:border-p3blue/);
   assert.doesNotMatch(markup, /blur-lg|bg-p3cyan\/30/);
+  assert.doesNotMatch(markup, /group-(?:hover|focus-visible):shadow/);
 });

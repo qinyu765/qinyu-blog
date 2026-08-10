@@ -39,7 +39,7 @@ export function getOrbMotionGeometry(
   viewportWidth: number,
   viewportHeight: number,
 ): OrbMotionGeometry {
-  const startCenterX = viewportWidth * 0.58;
+  const startCenterX = viewportWidth * 0.5;
   const startCenterY = viewportHeight * 0.45;
   const startSize = Math.min(viewportHeight * 0.58, viewportWidth * 0.52);
   const targetSize = viewportHeight * 0.7;

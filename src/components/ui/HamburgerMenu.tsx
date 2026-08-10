@@ -3,6 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
+import {
+  getHomeNavigationIntent,
+  isPlainNavigationActivation,
+} from '@/lib/home-entry';
 import { NavItem } from '@/types';
 
 interface HamburgerMenuProps {
@@ -17,6 +22,7 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   navItems,
 }) => {
   const pathname = usePathname();
+  const { prepareHomeSection, clearHomeSection } = useHomeEntry();
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -62,14 +68,35 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
               <Link
                 key={item.path}
                 href={item.path}
-                onClick={() => {
+                onClick={(event) => {
                   onToggle();
+                  const activation = {
+                    button: event.button,
+                    altKey: event.altKey,
+                    ctrlKey: event.ctrlKey,
+                    metaKey: event.metaKey,
+                    shiftKey: event.shiftKey,
+                  };
+                  const intent = getHomeNavigationIntent({
+                    pathname,
+                    href: item.path,
+                    activation,
+                  });
+                  if (intent === 'clear') {
+                    clearHomeSection();
+                  } else if (intent !== null) {
+                    prepareHomeSection(intent);
+                  }
+
                   const [pathPart, hashPart] = item.path.split('#');
                   const path = pathPart || '/';
-                  if (pathname === path && window.location.hash === (hashPart ? `#${hashPart}` : '')) {
+                  if (pathname === path && isPlainNavigationActivation(activation)) {
                     if (hashPart) {
+                      event.preventDefault();
+                      window.history.pushState(null, '', `#${hashPart}`);
                       document.getElementById(hashPart)?.scrollIntoView({ behavior: 'smooth' });
-                    } else {
+                    } else if (window.location.hash === '') {
+                      event.preventDefault();
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                   }

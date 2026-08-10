@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { OrbLayers } from '@/components/ui/OrbLayers';
+import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
 import {
   createWordParticles,
   particleStateAt,
@@ -13,8 +14,8 @@ import {
   getOrbMotionGeometry,
   getOrbMotionState,
   getOrbScrollProgress,
-  shouldAnimateOrb,
 } from '@/lib/orb-motion';
+import { resolveOrbEntryMode } from '@/lib/home-entry';
 
 const PARTICLE_SEED = 0x4c494e;
 
@@ -86,6 +87,7 @@ function clearCanvas(canvas: HTMLCanvasElement) {
 
 export const OrbScene: React.FC = () => {
   const pathname = usePathname();
+  const { pendingHomeSection } = useHomeEntry();
   const motionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -118,12 +120,14 @@ export const OrbScene: React.FC = () => {
       setupVersion += 1;
       const currentVersion = setupVersion;
 
-      const animate = shouldAnimateOrb({
+      const entryMode = resolveOrbEntryMode({
         pathname,
+        pendingHomeSection,
+        hash: window.location.hash,
         viewportWidth: window.innerWidth,
         reducedMotion: reducedMotionQuery.matches,
       });
-      if (!animate) {
+      if (entryMode !== 'intro') {
         disposeAnimation();
         disposeAnimation = () => {};
         applyRestingState();
@@ -245,12 +249,12 @@ export const OrbScene: React.FC = () => {
       window.removeEventListener('resize', scheduleInitialize);
       disposeAnimation();
     };
-  }, [pathname]);
+  }, [pathname, pendingHomeSection]);
 
   return (
     <div
       ref={motionRef}
-      data-home-intro={pathname === '/' ? 'true' : 'false'}
+      data-home-intro={pathname === '/' && pendingHomeSection === null ? 'true' : 'false'}
       className="p3r-orb-motion pointer-events-none"
       aria-hidden="true"
     >

@@ -81,7 +81,7 @@ export const BackgroundEffect: React.FC = () => {
   const ripples = Array.from({ length: RIPPLE_COUNT }, (_, i) => i);
 
   return (
-    <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none" aria-hidden="true">
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
       <style>{styles}</style>
 
       <div className="absolute inset-0 p3r-bg-base" />

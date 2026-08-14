@@ -1,6 +1,5 @@
 import { ReactNode, Suspense } from 'react';
 import { Github } from 'lucide-react';
-import { BackgroundEffect } from '@/components/ui/BackgroundEffect';
 import { LayoutChrome } from '@/components/LayoutChrome';
 import { GITHUB_URL } from '@/lib/site';
 
@@ -10,8 +9,7 @@ interface LayoutShellProps {
 
 export const LayoutShell = ({ children }: LayoutShellProps) => {
   return (
-    <div className="min-h-screen relative font-body text-white selection:bg-p3cyan selection:text-black overflow-x-hidden">
-      <BackgroundEffect />
+    <div className="relative z-10 min-h-screen overflow-x-hidden font-body text-white selection:bg-p3cyan selection:text-black">
       <Suspense>
         <LayoutChrome />
       </Suspense>

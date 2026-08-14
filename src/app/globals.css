@@ -37,7 +37,7 @@
   100% { transform: translateX(0); }
 }
 
-/* 月球场景：外层只负责滚动位移，内部三层使用不同周期交错浮动 */
+/* 月球场景：外层负责统一视觉进度，内部三组由 OrbScene 驱动交错浮动。 */
 .p3r-orb-motion {
   position: absolute;
   left: calc(100vw - 52vh);
@@ -65,51 +65,16 @@
 }
 
 .p3r-orb-mask {
-  z-index: 2;
   background: rgba(18, 105, 204, 0.92);
   filter: blur(0.6px);
+}
+
+.p3r-orb-surface {
   transform: translateX(18%);
-}
-
-.p3r-orb-wordmark {
-  transform: translateX(18%);
-}
-
-@keyframes p3r-orb-core-drift {
-  0%, 100% { transform: translate3d(-5px, 2px, 0); }
-  12.5% { transform: translate3d(-4px, -2px, 0); }
-  25% { transform: translate3d(-1px, -6px, 0); }
-  37.5% { transform: translate3d(4px, -5px, 0); }
-  50% { transform: translate3d(7px, -1px, 0); }
-  62.5% { transform: translate3d(6px, 4px, 0); }
-  75% { transform: translate3d(2px, 6px, 0); }
-  87.5% { transform: translate3d(-3px, 5px, 0); }
-}
-
-@keyframes p3r-orb-mask-drift {
-  0%, 100% { transform: translate3d(calc(18% - 8px), 3px, 0); }
-  12.5% { transform: translate3d(calc(18% - 7px), -3px, 0); }
-  25% { transform: translate3d(calc(18% - 2px), -8px, 0); }
-  37.5% { transform: translate3d(calc(18% + 5px), -7px, 0); }
-  50% { transform: translate3d(calc(18% + 9px), -2px, 0); }
-  62.5% { transform: translate3d(calc(18% + 8px), 5px, 0); }
-  75% { transform: translate3d(calc(18% + 2px), 9px, 0); }
-  87.5% { transform: translate3d(calc(18% - 5px), 8px, 0); }
-}
-
-@keyframes p3r-orb-bloom-breathe {
-  0%, 100% { transform: translate3d(5px, -1px, 0) scale(0.98); opacity: 0.68; }
-  12.5% { transform: translate3d(4px, -4px, 0) scale(0.99); opacity: 0.72; }
-  25% { transform: translate3d(0, -5px, 0) scale(1.01); opacity: 0.8; }
-  37.5% { transform: translate3d(-4px, -3px, 0) scale(1.03); opacity: 0.88; }
-  50% { transform: translate3d(-5px, 1px, 0) scale(1.04); opacity: 0.92; }
-  62.5% { transform: translate3d(-3px, 5px, 0) scale(1.03); opacity: 0.88; }
-  75% { transform: translate3d(1px, 5px, 0) scale(1.01); opacity: 0.8; }
-  87.5% { transform: translate3d(4px, 3px, 0) scale(0.99); opacity: 0.72; }
 }
 
 @media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .p3r-orb-motion[data-home-intro="true"] {
+  .p3r-orb-motion[data-orb-state="intro"] {
     left: 50vw;
     top: 45vh;
     width: min(58vh, 52vw);
@@ -118,30 +83,35 @@
     will-change: transform;
   }
 
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
-  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-bloom {
-    animation: p3r-orb-bloom-breathe 17s linear -5s infinite;
-    will-change: transform, opacity;
-  }
-
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
-  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-light {
-    animation: p3r-orb-core-drift 9s linear -2.25s infinite;
+  .p3r-orb-motion[data-orb-state="intro"],
+  .p3r-orb-motion[data-orb-state="scrolling"],
+  .p3r-orb-motion[data-orb-state="departing"],
+  .p3r-orb-motion[data-orb-state="returning"] {
     will-change: transform;
   }
 
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
-  .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
-  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-mask,
-  .p3r-orb-motion[data-home-returning="true"] .p3r-orb-wordmark {
-    animation: p3r-orb-mask-drift 13s linear -7.5s infinite;
+  .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-bloom,
+  .p3r-orb-motion[data-orb-state="scrolling"] .p3r-orb-bloom,
+  .p3r-orb-motion[data-orb-state="departing"] .p3r-orb-bloom,
+  .p3r-orb-motion[data-orb-state="returning"] .p3r-orb-bloom {
+    will-change: transform, opacity;
+  }
+
+  .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-light,
+  .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-surface,
+  .p3r-orb-motion[data-orb-state="scrolling"] .p3r-orb-light,
+  .p3r-orb-motion[data-orb-state="scrolling"] .p3r-orb-surface,
+  .p3r-orb-motion[data-orb-state="departing"] .p3r-orb-light,
+  .p3r-orb-motion[data-orb-state="departing"] .p3r-orb-surface,
+  .p3r-orb-motion[data-orb-state="returning"] .p3r-orb-light,
+  .p3r-orb-motion[data-orb-state="returning"] .p3r-orb-surface {
     will-change: transform;
   }
 }
 
 /* 直接打开首页锚点时，在 React 接管前也保持右上角终态。 */
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"],
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] {
+body:has(#about:target) .p3r-orb-motion[data-orb-state="intro"],
+body:has(#favorites:target) .p3r-orb-motion[data-orb-state="intro"] {
   left: calc(100vw - 52vh);
   top: -18vh;
   width: 70vh;
@@ -150,20 +120,16 @@ body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] {
   will-change: auto;
 }
 
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-bloom,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-light {
-  animation: none;
+body:has(#about:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-bloom,
+body:has(#about:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-light,
+body:has(#favorites:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-bloom,
+body:has(#favorites:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-light {
   transform: none;
   will-change: auto;
 }
 
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
-body:has(#about:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-mask,
-body:has(#favorites:target) .p3r-orb-motion[data-home-intro="true"] .p3r-orb-wordmark {
-  animation: none;
+body:has(#about:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-surface,
+body:has(#favorites:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-surface {
   transform: translateX(18%);
   will-change: auto;
 }
@@ -214,8 +180,7 @@ body {
     transform: none !important;
   }
 
-  .p3r-orb-mask,
-  .p3r-orb-wordmark {
+  .p3r-orb-surface {
     transform: translateX(18%) !important;
   }
 }

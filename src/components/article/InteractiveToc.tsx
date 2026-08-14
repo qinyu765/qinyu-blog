@@ -9,7 +9,8 @@ interface InteractiveTocProps {
   mode: 'mobile' | 'desktop';
 }
 
-const DESKTOP_MEDIA_QUERY = '(min-width: 1280px)';
+// 侧栏目录需要文章左侧至少留出一个完整目录宽度，否则会压到首屏标题卡。
+const DESKTOP_MEDIA_QUERY = '(min-width: 1536px)';
 
 export const InteractiveToc = ({ headings, mode }: InteractiveTocProps) => {
   const [activeId, setActiveId] = useState('');
@@ -95,7 +96,7 @@ export const InteractiveToc = ({ headings, mode }: InteractiveTocProps) => {
 
   if (mode === 'mobile') {
     return (
-      <div className="xl:hidden mb-8">
+      <div className="2xl:hidden mb-8">
         <TableOfContents
           headings={headings}
           activeId={activeId}
@@ -107,7 +108,7 @@ export const InteractiveToc = ({ headings, mode }: InteractiveTocProps) => {
   }
 
   return (
-    <aside className="hidden xl:block fixed top-24 left-8 w-64">
+    <aside className="hidden 2xl:block fixed top-24 left-8 w-64">
       <TableOfContents
         headings={headings}
         activeId={activeId}

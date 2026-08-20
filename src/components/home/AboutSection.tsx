@@ -62,8 +62,8 @@ export const AboutSection: React.FC = () => {
         <div className="mt-8 mb-12 max-w-4xl">
           <div className="relative pl-5 py-3 border-l-[3px] border-p3cyan bg-gradient-to-r from-p3cyan/10 to-transparent">
             <p className="text-white/80 text-sm md:text-base leading-loose tracking-wider font-light">
-              打过算法，玩过 TTS 声音克隆，用过很多 AI Agent <span className="text-white/50 text-xs md:text-sm">（Claude Code / Gemini CLI / Codex / Antigravity 等）</span>，<br className="hidden md:block"/>
-              始终保持对前沿新技术的好奇心与探索欲。
+              23和24年打过算法，对agent很感兴趣，有参与相关开源项目贡献也有自己做agent项目。<br className="hidden md:block"/>
+              喜欢故事性强的游戏，游戏整体风格我很喜欢Persona 3 Reload。音乐听的很杂；The weeknd、藤井风、鹤the crane 的歌都不错；钢琴，鼓，贝斯音色好听
             </p>
           </div>
         </div>

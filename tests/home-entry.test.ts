@@ -5,6 +5,7 @@ import {
   reduceHomeEntryIntent,
   reduceHomeIntroRequest,
   resolveOrbEntryMode,
+  shouldClearHomeAnchor,
 } from '../src/lib/home-entry';
 
 const desktopHome = {
@@ -136,4 +137,11 @@ test('普通 HOME 导航会请求重新播放首页开场', () => {
     key: 5,
     mode: 'returning',
   });
+});
+
+test('跨页锚点落位后清理临时 hash，直接打开 hash 则保留', () => {
+  assert.equal(shouldClearHomeAnchor('favorites', '#favorites'), true);
+  assert.equal(shouldClearHomeAnchor('about', '#about'), true);
+  assert.equal(shouldClearHomeAnchor(null, '#favorites'), false);
+  assert.equal(shouldClearHomeAnchor('favorites', '#about'), false);
 });

@@ -3,7 +3,10 @@
 import React, { useLayoutEffect } from 'react';
 import { BlogPost } from '@/types';
 import { CategoryGroup } from '@/lib/favorites';
-import { getHomeSectionFromHash } from '@/lib/home-entry';
+import {
+  getHomeSectionFromHash,
+  shouldClearHomeAnchor,
+} from '@/lib/home-entry';
 import { useHomeEntry } from '@/components/providers/HomeEntryProvider';
 import { HeroSection } from '@/components/home/HeroSection';
 import { RecentLogs } from '@/components/home/RecentLogs';
@@ -28,6 +31,14 @@ export const HomeClient: React.FC<HomeClientProps> = ({ posts, favorites }) => {
       target.scrollIntoView({ behavior: 'auto', block: 'start' });
     } else {
       window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+
+    if (shouldClearHomeAnchor(pendingHomeSection, window.location.hash)) {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}`,
+      );
     }
 
     clearHomeSection();

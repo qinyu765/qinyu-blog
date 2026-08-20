@@ -87,6 +87,14 @@ export function getHomeSectionFromHash(hash: string): HomeSection | null {
   return section === 'about' || section === 'favorites' ? section : null;
 }
 
+export function shouldClearHomeAnchor(
+  pendingHomeSection: HomeSection | null,
+  hash: string,
+): boolean {
+  return pendingHomeSection !== null
+    && getHomeSectionFromHash(hash) === pendingHomeSection;
+}
+
 export function getHomeNavigationIntent({
   pathname,
   href,

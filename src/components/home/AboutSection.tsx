@@ -62,8 +62,8 @@ export const AboutSection: React.FC = () => {
         <div className="mt-8 mb-12 max-w-4xl">
           <div className="relative pl-5 py-3 border-l-[3px] border-p3cyan bg-gradient-to-r from-p3cyan/10 to-transparent">
             <p className="text-white/80 text-sm md:text-base leading-loose tracking-wider font-light">
-              23和24年打过算法，对agent很感兴趣，有参与相关开源项目贡献也有自己做agent项目。<br className="hidden md:block"/>
-              喜欢故事性强的游戏，游戏整体风格我很喜欢Persona 3 Reload。音乐听的很杂；The weeknd、藤井风、鹤the crane 的歌都不错；钢琴，鼓，贝斯音色好听
+              23到24年打过算法；对agent感兴趣，有参与相关开源项目贡献也有自己做agent项目，当初学长分享agent的底层实现我就觉得很有意思。<br className="hidden md:block"/>
+              偏好故事性强的游戏或注重游戏性的优秀单机，可能上年纪了没什么PVP之魂，游戏风格很喜欢Persona 3 Reload这种。音乐听的很杂且多，The weeknd、藤井风、鹤The Crane 的歌都不错。
             </p>
           </div>
         </div>
@@ -72,10 +72,6 @@ export const AboutSection: React.FC = () => {
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-p3cyan/5 to-transparent opacity-0 transition-opacity duration-500 pointer-events-none" />
           <div className="relative z-10">
-            <h2 className="text-xl font-bold uppercase text-p3cyan mb-6 mt-3 flex items-center">
-              <span className="w-2 h-2 bg-white mr-3" />
-              Skills
-            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {SKILLS.map((skill, skillIndex) => {
                 const isExpanded = expandedSkill === skillIndex;

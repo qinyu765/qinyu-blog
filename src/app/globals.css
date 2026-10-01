@@ -10,10 +10,6 @@
   --color-p3red: #F40220;
   --color-p3black: #070100;
 
-  /* 亮色试验：仅反转 Tailwind 的纯黑/纯白中性色，保留 P3R 彩色层级。 */
-  --color-white: #000000;
-  --color-black: #ffffff;
-
   --font-display: 'Anton', 'Noto Sans SC', sans-serif;
   --font-body: 'Roboto Condensed', 'Noto Sans SC', sans-serif;
 
@@ -160,7 +156,7 @@ body:has(#favorites:target) .p3r-orb-motion[data-orb-state="intro"] .p3r-orb-sur
 
 body {
   background-color: #0D1B2A;
-  color: var(--color-white);
+  color: white;
   overflow-x: hidden;
 }
 

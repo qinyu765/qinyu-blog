@@ -17,7 +17,7 @@ const styles = `
       radial-gradient(1100px 900px at 18% 10%, rgba(81,238,252,0.08), transparent 70%),
       radial-gradient(1000px 800px at 82% 18%, rgba(109,154,199,0.08), transparent 68%),
       radial-gradient(600px 600px at 50% 40%, rgba(81,238,252,0.04), transparent 70%),
-      #ffffff;
+      #000000;
   }
 
   .p3r-caustics {

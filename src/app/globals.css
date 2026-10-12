@@ -167,6 +167,39 @@ body {
   min-width: 0;
 }
 
+/* 引用及嵌套容器保留内部段落间距，去除首尾多余留白。 */
+.markdown-content blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown-content blockquote > :last-child,
+.markdown-content li > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content li > ul,
+.markdown-content li > ol {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+
+.markdown-content .contains-task-list {
+  list-style: none;
+  margin-left: 0;
+}
+
+.markdown-content .task-list-item input {
+  margin-right: 0.5rem;
+  accent-color: var(--color-p3cyan);
+}
+
+.markdown-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-block: 1rem;
+}
+
 /* 尊重用户的"减少动画"偏好 */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

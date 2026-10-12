@@ -37,7 +37,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
   };
 
   return (
-    <div className="markdown-content">
+    <div className="markdown-content text-p3white text-base">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -51,7 +51,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             const id = findHeadingId(children);
             return (
               <div className="flex items-center space-x-4 mt-8 mb-4">
-                <div className="w-2 h-8 bg-p3blue transform -skew-x-12" />
+                <div className="w-2 h-8 shrink-0 bg-p3blue transform -skew-x-12" />
                 <h2
                   id={id}
                   className="text-2xl font-bold text-white uppercase tracking-wider scroll-mt-24"
@@ -64,7 +64,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
             const id = findHeadingId(children);
             return (
               <div className="flex items-center space-x-3 mt-6 mb-3">
-                <div className="w-1 h-6 bg-p3mid transform -skew-x-12" />
+                <div className="w-1 h-6 shrink-0 bg-p3mid transform -skew-x-12" />
                 <h3
                   id={id}
                   className="text-xl font-bold text-white/90 uppercase tracking-wide scroll-mt-24"
@@ -73,22 +73,28 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
               </div>
             );
           },
+          h4: ({ node: _node, ...props }) => <h4 className="mt-6 mb-3 text-lg font-bold text-white" {...props} />,
+          h5: ({ node: _node, ...props }) => <h5 className="mt-5 mb-2 text-base font-bold text-white" {...props} />,
+          h6: ({ node: _node, ...props }) => <h6 className="mt-4 mb-2 text-sm font-bold text-p3mid" {...props} />,
+          strong: ({ node: _node, ...props }) => <strong className="font-semibold underline decoration-wavy decoration-p3cyan decoration-2 underline-offset-4" {...props} />,
+          hr: ({ node: _node, ...props }) => <hr className="my-8 border-white/20" {...props} />,
+          ol: ({ node: _node, ...props }) => <ol className="list-decimal list-outside ml-6 mb-6 space-y-2 marker:text-p3cyan" {...props} />,
           p: ({ node: _node, ...props }) => (
             <p
-              className="text-p3white leading-loose mb-4 text-base"
+              className="leading-loose mb-4"
               {...props}
             />
           ),
           ul: ({ node: _node, ...props }) => (
             <ul
-              className="list-disc list-outside ml-6 mb-6 space-y-2 text-p3white marker:text-p3blue"
+              className="list-disc list-outside ml-6 mb-6 space-y-2 marker:text-p3blue"
               {...props}
             />
           ),
           li: ({ node: _node, ...props }) => <li className="pl-2" {...props} />,
           blockquote: ({ node: _node, ...props }) => (
             <blockquote
-              className="border-l-4 border-p3blue bg-p3blue/10 p-4 my-6 text-white/90"
+              className="border-l-4 border-p3blue bg-p3blue/10 p-4 my-6 text-p3mid text-sm"
               {...props}
             />
           ),
@@ -99,29 +105,14 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
                 href={href}
                 target={isExternal ? "_blank" : undefined}
                 rel={isExternal ? "noopener noreferrer" : undefined}
-                className="inline-flex items-center gap-1 text-p3cyan font-semibold relative group transition-colors duration-200 hover:text-white"
+                className="text-p3cyan font-semibold underline decoration-p3cyan/40 underline-offset-4 transition-colors duration-200 hover:text-white hover:decoration-white focus-visible:outline-2 focus-visible:outline-p3cyan"
                 {...props}
               >
-                <span className="inline-block w-1 h-3 bg-p3cyan transform -skew-x-12 opacity-60 group-hover:opacity-100 group-hover:bg-white transition-all duration-200" />
-                <span className="relative">
-                  {children}
-                  <span className="absolute left-0 -bottom-0.5 w-0 h-[2px] bg-p3cyan group-hover:w-full transition-all duration-300" />
-                </span>
-                {isExternal && (
-                  <svg
-                    className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 transition-opacity"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                )}
+                {children}
               </a>
             );
           },
-          code: ({ className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & ExtraProps) => {
+          code: ({ node: _node, className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & ExtraProps) => {
             const match = /language-([\w-]+)/.exec(className || "");
             if (match) {
               return React.createElement(

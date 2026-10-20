@@ -39,8 +39,7 @@ export const ArticleView = ({
         </div>
 
         <header className="article-surface article-surface-title mb-8 md:mb-12 p-5 md:p-12 overflow-hidden">
-          {/* 背景大字与斜纹 */}
-          <div className="absolute inset-0 bg-p3r-crosshatch opacity-10 pointer-events-none" />
+          {/* 背景大字 */}
           <div className="absolute -right-8 -top-8 text-[8rem] md:text-[12rem] font-display font-black text-white/5 transform -skew-x-12 select-none leading-none pointer-events-none overflow-hidden">
             {post.category || 'ARTICLE'}
           </div>

@@ -38,7 +38,7 @@ export const ArticleView = ({
           <ShareButton title={post.title} />
         </div>
 
-        <header className="mb-8 md:mb-12 relative p-5 md:p-12 border-2 border-white/10 bg-p3dark/50 overflow-hidden">
+        <header className="article-surface article-surface-title mb-8 md:mb-12 p-5 md:p-12 overflow-hidden">
           {/* 背景大字与斜纹 */}
           <div className="absolute inset-0 bg-p3r-crosshatch opacity-10 pointer-events-none" />
           <div className="absolute -right-8 -top-8 text-[8rem] md:text-[12rem] font-display font-black text-white/5 transform -skew-x-12 select-none leading-none pointer-events-none overflow-hidden">
@@ -61,8 +61,7 @@ export const ArticleView = ({
           <InteractiveToc headings={headings} mode="mobile" />
         )}
 
-        <div className="bg-p3black p-4 sm:p-8 md:p-12 border border-white/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/10 to-transparent transform rotate-45 translate-x-8 -translate-y-8" />
+        <div className="article-surface p-4 sm:p-8 md:p-12 overflow-hidden">
           <MarkdownRenderer content={post.content} headings={headings} />
         </div>
 

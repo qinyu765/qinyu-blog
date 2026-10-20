@@ -160,6 +160,34 @@ body {
   overflow-x: hidden;
 }
 
+/* 仅柔化底板边缘，正文、图片和交互元素保持完整对比度。 */
+.article-surface {
+  --article-feather: clamp(12px, 3vw, 28px);
+  position: relative;
+  isolation: isolate;
+}
+
+.article-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(13, 27, 42, 0.92), rgba(6, 14, 23, 0.94));
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, black var(--article-feather), black calc(100% - var(--article-feather)), transparent),
+    linear-gradient(to bottom, transparent, black var(--article-feather), black calc(100% - var(--article-feather)), transparent);
+  mask-image:
+    linear-gradient(to right, transparent, black var(--article-feather), black calc(100% - var(--article-feather)), transparent),
+    linear-gradient(to bottom, transparent, black var(--article-feather), black calc(100% - var(--article-feather)), transparent);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+.article-surface-title::before {
+  background: linear-gradient(135deg, rgba(13, 27, 42, 0.84), rgba(6, 14, 23, 0.88));
+}
+
 /* Markdown 内容区域溢出控制 */
 .markdown-content {
   overflow-wrap: break-word;

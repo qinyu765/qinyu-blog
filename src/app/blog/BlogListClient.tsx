@@ -3,10 +3,11 @@
 import React, { useState, useDeferredValue, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Search, X } from 'lucide-react';
+import { Rss, Search, X } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { BlogPost } from '@/types';
 import { blogPostPath } from '@/lib/content/routes';
+import { RSS_PATH } from '@/lib/site';
 
 interface BlogListClientProps {
   posts: BlogPost[];
@@ -57,7 +58,7 @@ export const BlogListClient: React.FC<BlogListClientProps> = ({ posts }) => {
   }, [deferredQuery, posts, fuse]);
 
   return (
-    <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-right-8 duration-500">
+    <div className="w-full min-w-0 max-w-4xl mx-auto animate-in fade-in slide-in-from-right-8 duration-500">
       {/* 搜索栏 */}
       <div
         className={`transition-all duration-300 ease-out ${
@@ -90,6 +91,17 @@ export const BlogListClient: React.FC<BlogListClientProps> = ({ posts }) => {
         </div>
       </div>
 
+      <div className="flex justify-end">
+        <a
+          href={RSS_PATH}
+          type="application/rss+xml"
+          className="inline-flex items-center gap-2 py-3 text-sm text-p3white transition-colors hover:text-p3cyan focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+        >
+          <Rss size={16} aria-hidden="true" />
+          <span>订阅 RSS</span>
+        </a>
+      </div>
+
       <div className="space-y-4">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post, index) => {
@@ -119,7 +131,7 @@ export const BlogListClient: React.FC<BlogListClientProps> = ({ posts }) => {
                     <div className="font-mono text-p3cyan text-lg w-32 shrink-0">
                       {post.date}
                     </div>
-                    <div className="flex-grow">
+                    <div className="min-w-0 flex-grow">
                       <h2 className="text-2xl font-bold uppercase group-hover:text-white transition-colors">
                         {post.title}
                       </h2>

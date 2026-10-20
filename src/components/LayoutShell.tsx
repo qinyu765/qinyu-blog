@@ -1,7 +1,7 @@
 import { ReactNode, Suspense } from 'react';
-import { Github } from 'lucide-react';
+import { Github, Rss } from 'lucide-react';
 import { LayoutChrome } from '@/components/LayoutChrome';
-import { GITHUB_URL } from '@/lib/site';
+import { GITHUB_URL, RSS_PATH } from '@/lib/site';
 
 interface LayoutShellProps {
   children: ReactNode;
@@ -19,18 +19,29 @@ export const LayoutShell = ({ children }: LayoutShellProps) => {
       <footer className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pb-8">
         <div className="flex flex-col gap-4 border-t border-white/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
           <span className="font-mono text-xs uppercase tracking-[0.28em] text-p3mid">
-            HF&apos;S BLOG // EXTERNAL LINK
+            HF&apos;S BLOG // CONNECT
           </span>
-          <a
-            href={GITHUB_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="访问 HF 的 GitHub 主页"
-            className="inline-flex items-center gap-2 self-start text-p3cyan transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark sm:self-auto"
-          >
-            <Github size={18} aria-hidden="true" />
-            <span className="font-display text-sm tracking-wider">GITHUB</span>
-          </a>
+          <div className="flex items-center gap-6">
+            <a
+              href={RSS_PATH}
+              type="application/rss+xml"
+              aria-label="RSS 订阅博客"
+              className="inline-flex items-center gap-2 py-2 text-p3cyan transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+            >
+              <Rss size={18} aria-hidden="true" />
+              <span className="font-display text-sm tracking-wider">RSS</span>
+            </a>
+            <a
+              href={GITHUB_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="访问 HF 的 GitHub 主页"
+              className="inline-flex items-center gap-2 py-2 text-p3cyan transition-colors duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-p3cyan focus-visible:ring-offset-2 focus-visible:ring-offset-p3dark"
+            >
+              <Github size={18} aria-hidden="true" />
+              <span className="font-display text-sm tracking-wider">GITHUB</span>
+            </a>
+          </div>
         </div>
       </footer>
     </div>

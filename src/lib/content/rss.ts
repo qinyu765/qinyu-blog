@@ -1,4 +1,4 @@
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '../site';
+import { RSS_PATH, SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '../site';
 import { contentDateToDate } from './date';
 import { listRoutableArticles } from './routes';
 import type { ContentCatalog } from './types';
@@ -38,7 +38,7 @@ export function buildRssXml(catalog: ContentCatalog, buildDate = new Date()): st
     <description>${escapeXml(SITE_DESCRIPTION)}</description>
     <language>zh-CN</language>
     <lastBuildDate>${buildDate.toUTCString()}</lastBuildDate>
-    <atom:link href="${absoluteUrl('/feed.xml')}" rel="self" type="application/rss+xml"/>
+    <atom:link href="${absoluteUrl(RSS_PATH)}" rel="self" type="application/rss+xml"/>
 ${items}
   </channel>
 </rss>

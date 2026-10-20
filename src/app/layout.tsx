@@ -3,7 +3,7 @@ import './globals.css';
 import { HomeEntryProvider } from '@/components/providers/HomeEntryProvider';
 import { BackgroundEffect } from '@/components/ui/BackgroundEffect';
 import { websiteJsonLd, personJsonLd } from '@/lib/structured-data';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site';
+import { RSS_PATH, SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: {
@@ -23,6 +23,11 @@ export const metadata: Metadata = {
     card: 'summary',
   },
   metadataBase: new URL(SITE_URL),
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: absoluteUrl(RSS_PATH), title: `${SITE_NAME} RSS` }],
+    },
+  },
 };
 
 export default function RootLayout({

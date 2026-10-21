@@ -82,5 +82,3 @@ tags: ["AI Coding", "Agent", "软件工程", "人机协作", "产品思考", "�
 社区里有两份规则给了我具体启发。Matt Pocock 的 [`wait-what`](https://github.com/mattpocock/skills/blob/main/skills/productivity/wait-what/SKILL.md) 用来在回答没讲明白时，补必要背景并重新解释；[`pr`](https://github.com/mattpocock/skills/blob/main/skills/engineering/pr/SKILL.md) 则要求用简洁视图说明变化，配上前后证据、可逆性和影响范围。我想借鉴的是这些组织信息的方式，中文效果还需要在实际任务中试。
 
 对我来说，阅读负担也提醒了一个更大的问题：当一个人能借助 Agent 推进更多工作时，他仍然只有有限的注意力。报告需要帮助他找到值得判断的地方。
-
-下一次 Agent 交付功能，我会先检查自己能否回答四个问题：它符合什么需求，接受了什么代价，有什么验证依据，以及系统发生了什么重要变化。答不上来的那一项，就是接下来值得补充解释或验证的地方。
